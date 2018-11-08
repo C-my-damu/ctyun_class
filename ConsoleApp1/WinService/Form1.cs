@@ -26,43 +26,62 @@ namespace WinService
     public partial class Form1 : Form
     {
 
-        static string filepath_scr = "";//用于存放待上传截屏文件的文件目录
-        static string filepath_cam = "";//用于存放待上传照片文件的文件目录
-        static string filepath_fil = "";//用于存放待上传课件文件的文件目录       
-        static string file2update = "";//用于存放待上传文件的文件目录
-        static bool flag_scr =true;//截屏标签
-        static bool flag_cam = false;//相机标签
-        static bool flag_fil = true;//文件标签
+        static string filepath_scr = "";//待上传截屏文件的文件目录
+        static string filepath_cam = "";//待上传照片文件的文件目录
+     
+        
+        static bool flag_scr =true;//截屏权限
+        static bool flag_cam = false;//相机权限
+        static bool do_scr = false;//截屏请求
+        static bool do_cam = false;//相机请求
+
         static string room_id = "";//教室码
         static string class_id = "";//课程码
-        static int stage = 0;//通讯状态
-        static string message = "";//存放tcp取回的信息
-        static bool newMsg = false;
-        private FilterInfoCollection videoDevices;
-        private VideoCaptureDevice videoSource;
-        private int Indexof = 0;
+        static int member = 0;//签到人次
 
+        static string message = "";//tcp取回的信息
+        static bool newMsg = false;//指示套接字接收是否已经刷新
 
+        private FilterInfoCollection videoDevices;//存放摄像头列表
+        private VideoCaptureDevice videoSource;//视频源
+        private int Indexof = 0;//摄像头的当前选择项
 
-        static Thread ThreadClient = null;
-        static Socket SocketClient = null;
+        static Thread ThreadClient = null;//TCP线程
+        static Socket SocketClient = null;//TCP客户端
 
-        static ThreadStart threadStart = new ThreadStart(startUpload);
+        static ThreadStart threadStart = new ThreadStart(startUpload);//文件上传线程
         Thread clock0 = new Thread(threadStart);
-        public static void startUpload() {//上传文件线程，上传错误则抛出提示
+
+        public static void startUpload()//上传文件线程，上传错误则抛出提示
+        {
             int t = 0;
-            while (uploadFile(file2update) != 1&&t<10) {
+            while (uploadFile("file2update") != 1&&t<10) {
                 t++;
             };
             if (t == 10) {
                 MessageBox.Show("文件上传失败，请检查网络连接");
             }
         }
-        public static int uploadFile(string file) {//上传文件实体方法
+
+        public static int uploadFile(string file)//上传文件实体方法
+        {
             //to do:获取时间，打时间戳，课程戳，写文件名，上传文件
             //1成功0失败
             return 1;
         }
+
+        public void pushButton1()
+        {
+            button1.PerformClick();
+
+        }
+
+        public void pushButton2()
+        {
+            button2.PerformClick();
+
+        }
+
         public static int connectToCtyun()//启动套接字连接服务器
         {
             try
@@ -125,16 +144,35 @@ namespace WinService
 
                     //将套接字获取到的字符数组转换为人可以看懂的字符串  
                     string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
-                    message = strRevMsg;//将获得的数据放在缓存
-                    newMsg = true;
-                    //Console.WriteLine(message);
-                    
-                    
-                        //stage = 1;
-                        //ClientSendMsg("select id,name from classroom;");
-                    
-                    
+                    if(strRevMsg=="photo"|| strRevMsg == "screen" || strRevMsg == "login")
+                    {
+                        switch (strRevMsg)
+                        {
+                            case "screen":
+                                {
+                                    do_scr = true;
+                                    break;
+                                }
+                            case "photo":
+                                {
+                                    do_cam = true;
+                                    break;
+                                }
+                            case "login":
+                                {
+                                    member++;
+                                    break;
+                                }
+                        }
+
+                    }
+                    else
+                    {
+                        message = strRevMsg;//将获得的数据放在缓存
+                        newMsg = true;
                         Console.WriteLine(message + "\r\n");
+                    }
+                    
                     
                     
                 }
@@ -145,9 +183,8 @@ namespace WinService
                 }
             }
         }
-
-        //发送字符信息到服务端的方法  
-        public static void ClientSendMsg(string sendMsg)
+       
+        public static void ClientSendMsg(string sendMsg)//发送字符信息到服务端的方法  
         {
             //将输入的内容字符串转换为机器可以识别的字节数组     
             byte[] arrClientSendMsg = Encoding.UTF8.GetBytes(sendMsg);
@@ -173,6 +210,7 @@ namespace WinService
             gp.DrawImage(tSrcBmp, 0, 0, tScreenRect, GraphicsUnit.Pixel);
             return tSrcBmp;
         }
+
         private void Camlist()//获取摄像头列表
         {
             videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
@@ -187,6 +225,7 @@ namespace WinService
                 Cameralist.SelectedIndex = 0;
             }
         }
+
         private void startCam()//开启摄像头
         {
             Indexof = Cameralist.SelectedIndex;
@@ -200,6 +239,7 @@ namespace WinService
             videoSourcePlayer1.VideoSource = videoSource;
             videoSourcePlayer1.Start();          
         }
+
         private void closeCam()//关闭摄像头
         {
             Indexof = Cameralist.SelectedIndex;         
@@ -208,6 +248,7 @@ namespace WinService
             videoSourcePlayer1.Stop();
 
         }
+
         public static Bitmap ResizeUsingEmguCV(Bitmap original, int newWidth, int newHeight)//图片插值缩放
         {
             try
@@ -223,19 +264,17 @@ namespace WinService
                 return null;
             }
         }
+
         private Bitmap getPhoto()//拍照
         {
                  Bitmap b = new Bitmap( videoSourcePlayer1.GetCurrentVideoFrame());
             return b;
 
         }
+
         private void sendFlag()//广播教室号和权限
         {
             ClientSendMsg("flag_"+room_id.ToString()+"_"+flag_scr.ToString()+"_"+flag_cam.ToString());
-        }
-        private void sendLogin()//广播教室号登陆
-        {
-            ClientSendMsg("LoginRoom_" + room_id.ToString());
         }
 
         public Form1()
@@ -256,6 +295,7 @@ namespace WinService
 
         private void timer1_Tick(object sender, EventArgs e)//时钟
         {
+            
             label4.Text = DateTime.Now.ToString();
         }
 
@@ -293,20 +333,11 @@ namespace WinService
             //sendFlag();
         }
 
-        private void button4_Click(object sender, EventArgs e)//控制文件获取权限
-        {
-            //flag_fil = !flag_fil;
-            //button3.Enabled = !button3.Enabled;
-            //if (flag_fil)
-            //    button4.BackColor = Color.Blue;
-            //else
-            //    button4.BackColor = Color.Red;
-        }
-
         private void button1_Click(object sender, EventArgs e)//截图按钮
         {
             string name = System.DateTime.Now.Hour.ToString()+"_"+ System.DateTime.Now.Minute.ToString() + "_" + System.DateTime.Now.Second.ToString() ;
             string date = System.DateTime.Now.ToLongDateString();
+            FormWindowState t = WindowState;
             WindowState = FormWindowState.Minimized;
             Thread.Sleep(200);
             Bitmap b = GetScreenCapture();
@@ -323,7 +354,7 @@ namespace WinService
             }
             catch (Exception)
             {
-                WindowState = FormWindowState.Normal;
+                WindowState = t;
                 MessageBox.Show("截屏保存失败，请确认软件权限或关闭截图功能");
                 throw;
             }
@@ -333,7 +364,7 @@ namespace WinService
                 pictureBox1.Image = null;
             }
             pictureBox1.Image = b;
-            WindowState = FormWindowState.Normal;
+            WindowState = t;
             //Clipboard.SetImage(b);
             this.Cursor = Cursors.Default;
         }
@@ -410,20 +441,8 @@ namespace WinService
                 Application.Exit();
             }
             Thread.Sleep(1000);
-            ClientSendMsg("room");
-            
-            if (stage == 1)
-            {
-                //ClientSendMsg("select name from classroom;");
-                // if (message.StartsWith("1\n\r")) {
-                string temp = message;
-                //     temp.Remove(0, 3);
-                //Console.WriteLine(temp);
-                //}
-            }
-            //ClientSendMsg("select name from room;");
-
-        }
+            //ClientSendMsg("room");
+        }//窗体控件初始化
 
         private void comboBox2_DropDown(object sender, EventArgs e)
         {
@@ -442,7 +461,7 @@ namespace WinService
                 string[] a = message.Split('$');
                 comboBox2.Items.AddRange(a);
             }
-        }
+        }//教室下拉菜单
 
         private void comboBox3_DropDown(object sender, EventArgs e)
         {
@@ -461,9 +480,9 @@ namespace WinService
                 string[] a = message.Split('$');
                 comboBox3.Items.AddRange(a);
             }
-        }
+        }//课程下拉菜单
 
-        private void button3_Click(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)//上课按钮，将客户端注册到服务器
         {
             if (!SocketClient.Connected)
             {
@@ -524,15 +543,29 @@ namespace WinService
             }
             else
             MessageBox.Show("当前教室或课程未选择！");
+            button4.Enabled = true;
+            button3.Enabled = false;
         }
 
-        private void timer2_Tick(object sender, EventArgs e)
+        private void timer2_Tick(object sender, EventArgs e)//刷新签到人数并检测是否需要截图拍照
         {
-            //pictureBox2.Image = videoSourcePlayer1.GetCurrentVideoFrame();
+            label8.Text = member.ToString();
+            if (do_scr)
+            {
+                button1.PerformClick();
+                do_scr = false;
+            }
+            if (do_cam)
+            {
+                button2.PerformClick();
+                do_cam = false;
+            }
         }
 
-        private void button4_Click_1(object sender, EventArgs e)
+        private void button4_Click(object sender, EventArgs e)//下课按钮，清空签到人数，释放套接字
         {
+            member = 0;
+            
             if (ThreadClient.IsAlive)
                 ThreadClient.Abort();
             if (SocketClient.Connected)
@@ -549,6 +582,9 @@ namespace WinService
             {
                 videoSource.Stop();
             }
+            button3.Enabled = true;
+            button4.Enabled = false;
         }
+   
     }
 }
