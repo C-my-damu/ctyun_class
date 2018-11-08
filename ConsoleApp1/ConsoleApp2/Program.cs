@@ -165,6 +165,18 @@ namespace ConsoleApp2
                     else {
                         if (temp.StartsWith("sql-"))
                         {
+                            if (localSql.State == ConnectionState.Closed)
+                            {
+                                try
+                                {                            
+                                    localSql.Open();                                    
+                                }
+                                catch (Exception)
+                                {
+                                    Console.WriteLine("can not open database!\r\n");
+                                    throw;
+                                }
+                            }
                             temp = temp.Replace("sql-", "");
                             Console.WriteLine("SQL  " + temp);
                             string sql = string.Format(temp);
@@ -189,6 +201,7 @@ namespace ConsoleApp2
                             mycmd.Cancel();
                             mycmd.Dispose();
                             socketServer.Send(Encoding.UTF8.GetBytes(resql));
+                            //Thread.Sleep(100);
                         }
                        
                     }

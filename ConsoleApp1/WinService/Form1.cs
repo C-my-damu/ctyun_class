@@ -37,9 +37,11 @@ namespace WinService
         static string class_id = "";//课程码
         static int stage = 0;//通讯状态
         static string message = "";//存放tcp取回的信息
+        static bool newMsg = false;
         private FilterInfoCollection videoDevices;
         private VideoCaptureDevice videoSource;
         private int Indexof = 0;
+
 
 
         static Thread ThreadClient = null;
@@ -124,6 +126,7 @@ namespace WinService
                     //将套接字获取到的字符数组转换为人可以看懂的字符串  
                     string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
                     message = strRevMsg;//将获得的数据放在缓存
+                    newMsg = true;
                     //Console.WriteLine(message);
                     
                     
@@ -148,8 +151,17 @@ namespace WinService
         {
             //将输入的内容字符串转换为机器可以识别的字节数组     
             byte[] arrClientSendMsg = Encoding.UTF8.GetBytes(sendMsg);
-            //调用客户端套接字发送字节数组     
-            SocketClient.Send(arrClientSendMsg);
+            //调用客户端套接字发送字节数组  
+            try
+            {
+                SocketClient.Send(arrClientSendMsg);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
+                //throw;
+            }
+            
         }
 
         private Bitmap GetScreenCapture()//截图
@@ -186,8 +198,7 @@ namespace WinService
            videoSourcePlayer1.Visible = true;//videoDevices[Indexof]确定出用哪个摄像头了。
             videoSource = new VideoCaptureDevice(videoDevices[Indexof].MonikerString);
             videoSourcePlayer1.VideoSource = videoSource;
-            videoSourcePlayer1.Start();
-           
+            videoSourcePlayer1.Start();          
         }
         private void closeCam()//关闭摄像头
         {
@@ -214,7 +225,7 @@ namespace WinService
         }
         private Bitmap getPhoto()//拍照
         {
-                 Bitmap b = videoSourcePlayer1.GetCurrentVideoFrame();
+                 Bitmap b = new Bitmap( videoSourcePlayer1.GetCurrentVideoFrame());
             return b;
 
         }
@@ -267,15 +278,19 @@ namespace WinService
             if (flag_cam)
             {
                 button5.BackColor = Color.Blue;
+                //pictureBox2.Visible = true;
                 startCam();
+                timer2.Enabled = true;
             }
-
             else
             {
                 button5.BackColor = Color.Red;
+                //pictureBox2.Visible = false;
+                timer2.Enabled = false;
                 closeCam();
             }
-            sendFlag();
+            Thread.Sleep(2500);
+            //sendFlag();
         }
 
         private void button4_Click(object sender, EventArgs e)//控制文件获取权限
@@ -341,6 +356,7 @@ namespace WinService
                     bb.Save(subPath + name + ".jpg");
                     pictureBox2.Visible = true;
                     pictureBox2.Image = b;
+                   
                    // videoSourcePlayer1.Stop();
                     videoSourcePlayer1.Visible = false;                   
                     Thread.Sleep(2000);
@@ -362,76 +378,142 @@ namespace WinService
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)//程序结束释放资源
         {
-            if(ThreadClient.IsAlive)
-            ThreadClient.Abort();
-            if (SocketClient.Connected)
+            if (ThreadClient != null && ThreadClient.IsAlive)
             {
-                ClientSendMsg("close");
-                SocketClient.Shutdown(SocketShutdown.Both);
-                
-                SocketClient.Close();
-                SocketClient.Dispose();
+                ThreadClient.Abort();
             }
-            
-            videoSourcePlayer1.Stop();
-            if (videoSource!=null&& videoSource.IsRunning)
-            {
-                videoSource.Stop();
-            } 
-            //to do:断开与数据库的连接
+                if (SocketClient!=null&&SocketClient.Connected)
+                {
+                   // ClientSendMsg("close");
+                    SocketClient.Shutdown(SocketShutdown.Both);
+
+                    SocketClient.Close();
+                    SocketClient.Dispose();
+                }
+
+                videoSourcePlayer1.Stop();
+                if (videoSource != null && videoSource.IsRunning)
+                {
+                    videoSource.Stop();
+                }
+                //to do:断开与数据库的连接
             
             Thread.Sleep(1000);
         }
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            Thread.Sleep(1000);
+           // Thread.Sleep(1000);
             if (-1 == connectToCtyun())//若连接异常推出程序
             {
-                Thread.Sleep(1000);
+               // Thread.Sleep(1000);
                 Application.Exit();
             }
+            Thread.Sleep(1000);
             ClientSendMsg("room");
-            Thread.Sleep(100);
+            
             if (stage == 1)
             {
                 //ClientSendMsg("select name from classroom;");
-               // if (message.StartsWith("1\n\r")) {
-                    string temp = message;
-               //     temp.Remove(0, 3);
-                    //Console.WriteLine(temp);
+                // if (message.StartsWith("1\n\r")) {
+                string temp = message;
+                //     temp.Remove(0, 3);
+                //Console.WriteLine(temp);
                 //}
             }
-                //ClientSendMsg("select name from room;");
+            //ClientSendMsg("select name from room;");
 
         }
 
         private void comboBox2_DropDown(object sender, EventArgs e)
         {
-            ClientSendMsg("sql-select name from classroom;");
-            Thread.Sleep(500);
-            string[] a = message.Split('$');
             comboBox2.Items.Clear();
-            comboBox2.Items.AddRange(a);
+            newMsg = false;
+            Console.WriteLine(newMsg.ToString());
+            int t = 0;
+            ClientSendMsg("sql-select name from classroom;");
+            while (!newMsg&&t<100)
+            {
+                Thread.Sleep(50);             
+                t++;
+            }
+            if (t < 100)
+            {
+                string[] a = message.Split('$');
+                comboBox2.Items.AddRange(a);
+            }
         }
 
         private void comboBox3_DropDown(object sender, EventArgs e)
         {
-            ClientSendMsg("sql-select name from class;");
-            Thread.Sleep(500);
-            string[] a = message.Split('$');
             comboBox3.Items.Clear();
-            comboBox3.Items.AddRange(a);
+            newMsg = false;
+            Console.WriteLine(newMsg.ToString());
+            int t = 0;
+            ClientSendMsg("sql-select name from class;");
+            while (!newMsg && t < 100)
+            {
+                Thread.Sleep(50);              
+                t++;
+            }
+            if (t < 100)
+            {
+                string[] a = message.Split('$');
+                comboBox3.Items.AddRange(a);
+            }
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
+            if (!SocketClient.Connected)
+            {
+                Thread.Sleep(1000);
+                if (-1 == connectToCtyun())//若连接异常推出程序
+                {
+                    MessageBox.Show("连接服务器失败！");
+                    Thread.Sleep(1000);
+                    Application.Exit();
+                }
+                else
+                {
+                    MessageBox.Show("连接服务器成功！");
+                }
+            }
             if (comboBox2.SelectedIndex.ToString() != "" && comboBox3.SelectedItem.ToString() != "")
             {
-                DialogResult dr = MessageBox.Show("当前教室：" + comboBox2.SelectedIndex.ToString() + "\n\r当前课程：" + comboBox2.SelectedIndex.ToString() + "\n\r是否确认？", "取消", MessageBoxButtons.OKCancel);
+                DialogResult dr = MessageBox.Show("当前教室：" + comboBox2.SelectedItem.ToString() + "\n\r当前课程：" + comboBox3.SelectedItem.ToString() + "\n\r是否确认？", "取消", MessageBoxButtons.OKCancel);
                 if (dr == DialogResult.OK)
                 {
-                    ClientSendMsg("sql- UPDATE `classroom` SET `ip` = '192.168.1.1', `class_now` = '"+comboBox3.SelectedItem.ToString()+"'where(name='"+comboBox2.SelectedItem.ToString()+"') ");
+                    ClientSendMsg("sql- UPDATE `classroom` SET `ip` = '"+SocketClient.LocalEndPoint.ToString()+"', `class_now` = '"+comboBox3.SelectedItem.ToString()+"'where(name='"+comboBox2.SelectedItem.ToString()+"') ");
+                    newMsg = false;
+                    int t = 0;
+                    ClientSendMsg("sql- select id from classroom where(name='" + comboBox2.SelectedItem.ToString() + "') ");
+                    while (!newMsg && t < 100)
+                    {
+                        Thread.Sleep(50);
+                        t++;
+                    }
+                    if (t < 100)
+                    {
+                        room_id = message.Split('$')[0];
+                        Console.WriteLine("room_id:" + room_id + "\n\r");
+                    }
+                    Thread.Sleep(500);
+                    t = 0;
+                    newMsg = false;
+                    ClientSendMsg("sql- select id from class where(name='" + comboBox3.SelectedItem.ToString() + "') ");
+                    while (!newMsg && t < 100)
+                    {
+                        Thread.Sleep(50);
+                        t++;
+                    }
+                    if (t < 100)
+                    {
+                        class_id = message.Split('$')[0];
+                        Console.WriteLine("class_id:" + room_id + "\n\r");
+                    }
+                    comboBox2.Enabled = false;
+                    comboBox3.Enabled = false;
                 }
                 else
                 {
@@ -442,6 +524,31 @@ namespace WinService
             }
             else
             MessageBox.Show("当前教室或课程未选择！");
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            //pictureBox2.Image = videoSourcePlayer1.GetCurrentVideoFrame();
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            if (ThreadClient.IsAlive)
+                ThreadClient.Abort();
+            if (SocketClient.Connected)
+            {
+                ClientSendMsg("close");
+                SocketClient.Shutdown(SocketShutdown.Both);
+
+                SocketClient.Close();
+                SocketClient.Dispose();
+            }
+
+            videoSourcePlayer1.Stop();
+            if (videoSource != null && videoSource.IsRunning)
+            {
+                videoSource.Stop();
+            }
         }
     }
 }
