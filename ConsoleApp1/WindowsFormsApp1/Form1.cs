@@ -25,26 +25,12 @@ namespace WindowsFormsApp1
         static string message = "";
 
         static string room_id = "";
+        static string room_name = "";
         static string student_id = "";
         static string class_id = "";
         static string class_name = "";
 
-        private void sendCMD(int i)//拍照/截图命令
-        {
-            if (i == 1)
-            {
-                if (flag_scr) ClientSendMsg("screen_" + room_id.ToString());
-                else MessageBox.Show("讲台关闭了截屏权限");
-
-            }
-           
-            if (i == 2)
-            {
-                if (flag_cam) ClientSendMsg("photo_" + room_id.ToString());
-                else MessageBox.Show("讲台关闭了截图权限");
-            }
-           
-        }
+        
         private void sendLogin()//广播教室号登陆
         {
             ClientSendMsg("LoginStudent_" + room_id.ToString());
@@ -97,37 +83,38 @@ namespace WindowsFormsApp1
 
                     //将客户端套接字接收到的数据存入内存缓冲区，并获取长度  
                     int length = SocketClient.Receive(arrRecvmsg);
-
+                    
                     //将套接字获取到的字符数组转换为人可以看懂的字符串  
                     string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
-
+                    Console.WriteLine(strRevMsg);
                     if (strRevMsg.StartsWith("f-t") || strRevMsg.StartsWith("t-f") ||//接收到权限变化指令
                         strRevMsg.StartsWith("f-f") || strRevMsg.StartsWith("t-t"))
                     {
-                        if (strRevMsg.EndsWith(class_name))
+                        if (strRevMsg.EndsWith(room_name))
                         {
-                            string s = strRevMsg.Replace(class_name, "");
+                            string s = strRevMsg.Replace(room_name, "$");
+                            Console.WriteLine(s);
                             switch (s)
                             {
-                                case "f-t":
+                                case "f-t$":
                                     {
                                         flag_scr = false;
                                         flag_cam = true;
                                         break;
                                     }
-                                case "t-f":
+                                case "t-f$":
                                     {
                                         flag_scr = true;
                                         flag_cam = false;
                                         break;
                                     }
-                                case "f-f":
+                                case "f-f$":
                                     {
                                         flag_scr = false;
                                         flag_cam = false;
                                         break;
                                     }
-                                case "t-t":
+                                case "t-t$":
                                     {
                                         flag_scr = true;
                                         flag_cam = true;
@@ -245,7 +232,7 @@ namespace WindowsFormsApp1
             {
                 Application.Exit();
             }
-
+            timer2.Enabled = true;
             
         }
 
@@ -361,7 +348,7 @@ namespace WindowsFormsApp1
                     //Thread.Sleep(500);
                     t = 0;
                     newMsg = false;
-                    ClientSendMsg("sql- select id from class where(name='" + textBox2.Text + "') ");//获得当前课程id
+                    ClientSendMsg("sql- select name from classroom where(name='" + textBox2.Text + "') ");//获得当前课程id
                     while (!newMsg && t < 100)
                     {
                         Thread.Sleep(50);
@@ -375,7 +362,7 @@ namespace WindowsFormsApp1
                     //Thread.Sleep(500);
                     t = 0;
                     newMsg = false;
-                    ClientSendMsg("sql- select * from choice where(id_student='" + student_id + "' and id_class='"+class_id+"') ");//获得当前课程id
+                    ClientSendMsg("sql- select * from choice where(id_student='" + student_id + "' and id_class='"+class_id+"') ");//查询是否第一次上这门课
                     while (!newMsg && t < 100)
                     {
                         Thread.Sleep(50);
@@ -383,16 +370,17 @@ namespace WindowsFormsApp1
                     }
                     if (t < 100)
                     {
-                        if (message == "$")
+                        if (message == "$")//无此课报名记录
                         {
-                            ClientSendMsg("sql- INSERT INTO `choice` (`id_student`, `id_class`) VALUES (" + student_id + ", " + class_id + ");");
+                            ClientSendMsg("sql- INSERT INTO `choice` (`id_student`, `id_class`) VALUES (" + student_id + ", " + class_id + ");");//选课
                         }
                     }
                     
 
-                    ClientSendMsg("sql- INSERT INTO `attend` (`id_student`, `id_room`,`date`) VALUES ("+student_id+", "+room_id+",'"+DateTime.Now.ToShortDateString()+" "+DateTime.Now.ToShortTimeString()+":"+DateTime.Now.Second.ToString()+"');");
-                    ClientSendMsg("login_" + room_id);
-                    class_name = comboBox2.SelectedIndex.ToString();
+                    ClientSendMsg("sql- INSERT INTO `attend` (`id_student`, `id_room`,`date`) VALUES ("+student_id+", "+room_id+",'"+DateTime.Now.ToShortDateString()+" "+DateTime.Now.ToShortTimeString()+":"+DateTime.Now.Second.ToString()+"');");//登记上课记录
+                    ClientSendMsg("login_" + room_id);//签到
+                    class_name = textBox2.Text;
+                    room_name = comboBox2.SelectedItem.ToString();
                     comboBox1.Enabled = false;
                     comboBox2.Enabled = false;
                 }
@@ -411,10 +399,13 @@ namespace WindowsFormsApp1
 
         private void button4_Click(object sender, EventArgs e)
         {
+            ClientSendMsg("logout_" + room_id);
+            Thread.Sleep(1000);
             if (ThreadClient.IsAlive)
                 ThreadClient.Abort();
             if (SocketClient.Connected)
             {
+                
                 ClientSendMsg("close");
                 SocketClient.Shutdown(SocketShutdown.Both);
 
@@ -432,7 +423,16 @@ namespace WindowsFormsApp1
 
         private void button3_Click(object sender, EventArgs e)
         {
+          
             ClientSendMsg("photo_"+room_id);
+           
+            
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            button2.Enabled = flag_scr;
+            button3.Enabled = flag_cam;
         }
     }
 }

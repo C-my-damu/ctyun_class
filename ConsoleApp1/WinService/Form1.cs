@@ -36,6 +36,7 @@ namespace WinService
         static bool do_cam = false;//相机请求
 
         static string room_id = "";//教室码
+        static string room_name = "";//教室名
         static string class_id = "";//课程码
         static int member = 0;//签到人次
 
@@ -74,13 +75,13 @@ namespace WinService
         {
             button1.PerformClick();
 
-        }
+        }//调用截图按钮
 
         public void pushButton2()
         {
             button2.PerformClick();
 
-        }
+        }//调用拍照按钮
 
         public static int connectToCtyun()//启动套接字连接服务器
         {
@@ -144,7 +145,7 @@ namespace WinService
 
                     //将套接字获取到的字符数组转换为人可以看懂的字符串  
                     string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
-                    if(strRevMsg=="photo"|| strRevMsg == "screen" || strRevMsg == "login")
+                    if(strRevMsg=="photo"|| strRevMsg == "screen" || strRevMsg == "login"|| strRevMsg == "logout")//处理命令
                     {
                         switch (strRevMsg)
                         {
@@ -161,6 +162,7 @@ namespace WinService
                             case "login":
                                 {
                                     member++;
+                                    sendFlag();
                                     break;
                                 }
                             case "logout":
@@ -172,7 +174,7 @@ namespace WinService
                         }
 
                     }
-                    else
+                    else//不是指令，则为数据库返回的数据
                     {
                         message = strRevMsg;//将获得的数据放在缓存
                         newMsg = true;
@@ -278,7 +280,7 @@ namespace WinService
 
         }
 
-        private void sendFlag()//广播教室号和权限
+        public static void sendFlag()//广播教室号和权限
         {
             string flag = "";
             switch (flag_scr)
@@ -307,7 +309,7 @@ namespace WinService
                         break;
                     }
             }
-            ClientSendMsg("flag_"+flag+comboBox2.SelectedItem.ToString());
+            ClientSendMsg("flag_"+flag+room_name);
         }
 
         public Form1()
@@ -318,6 +320,7 @@ namespace WinService
         private void Form1_Load(object sender, EventArgs e)//初始化界面，载入预设
         {
             timer1.Enabled = true;
+            timer2.Enabled = true;
             Camlist();
 
             //button4.BackColor = Color.Blue;
@@ -353,13 +356,13 @@ namespace WinService
                 button5.BackColor = Color.Blue;
                 //pictureBox2.Visible = true;
                 startCam();
-                timer2.Enabled = true;
+                //timer2.Enabled = true;
             }
             else
             {
                 button5.BackColor = Color.Red;
                 //pictureBox2.Visible = false;
-                timer2.Enabled = false;
+               // timer2.Enabled = false;
                 closeCam();
             }
             Thread.Sleep(2500);
@@ -378,7 +381,7 @@ namespace WinService
             g.CopyFromScreen(0, 0, 0, 0, new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height));
             try
             {
-                string subPath = "D:/ctyunclass/" + class_id + "/src/"+date+"/";
+                string subPath = "D:/ctyunclass/" + comboBox3.SelectedItem.ToString() + "/src/"+date+"/";
                 if (false == System.IO.Directory.Exists(subPath))
                 {
                     System.IO.Directory.CreateDirectory(subPath);
@@ -412,7 +415,7 @@ namespace WinService
                 Bitmap bb = ResizeUsingEmguCV(b, 1280, 720);
                 try
                 {
-                    string subPath = "D:/ctyunclass/" + class_id + "/pic/" + date + "/";
+                    string subPath = "D:/ctyunclass/" + comboBox3.SelectedItem.ToString() + "/pic/" + date + "/";
                     if (false == System.IO.Directory.Exists(subPath))
                     {
                         System.IO.Directory.CreateDirectory(subPath);
@@ -465,7 +468,7 @@ namespace WinService
             Thread.Sleep(1000);
         }
 
-        private void Form1_Shown(object sender, EventArgs e)
+        private void Form1_Shown(object sender, EventArgs e)//初始化控件
         {
            // Thread.Sleep(1000);
             if (-1 == connectToCtyun())//若连接异常推出程序
@@ -477,7 +480,7 @@ namespace WinService
             //ClientSendMsg("room");
         }//窗体控件初始化
 
-        private void comboBox2_DropDown(object sender, EventArgs e)
+        private void comboBox2_DropDown(object sender, EventArgs e)//选择教室
         {
             comboBox2.Items.Clear();
             newMsg = false;
@@ -494,9 +497,9 @@ namespace WinService
                 string[] a = message.Split('$');
                 comboBox2.Items.AddRange(a);
             }
-        }//教室下拉菜单
+        }
 
-        private void comboBox3_DropDown(object sender, EventArgs e)
+        private void comboBox3_DropDown(object sender, EventArgs e)//课程下拉菜单
         {
             comboBox3.Items.Clear();
             newMsg = false;
@@ -513,7 +516,7 @@ namespace WinService
                 string[] a = message.Split('$');
                 comboBox3.Items.AddRange(a);
             }
-        }//课程下拉菜单
+        }
 
         private void button3_Click(object sender, EventArgs e)//上课按钮，将客户端注册到服务器
         {
@@ -564,6 +567,7 @@ namespace WinService
                         class_id = message.Split('$')[0];
                         Console.WriteLine("class_id:" + room_id + "\n\r");
                     }
+                    room_name = comboBox2.SelectedItem.ToString();
                     comboBox2.Enabled = false;
                     comboBox3.Enabled = false;
                 }

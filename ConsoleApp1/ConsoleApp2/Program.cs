@@ -261,9 +261,9 @@ namespace ConsoleApp2
                             mycmd.Cancel();
                             mycmd.Dispose();
                         }
-                        if (temp.StartsWith("screen_"))//转发签到
+                        if (temp.StartsWith("login_"))//转发签到
                         {
-                            string temp0 = "select ip from classroom where (id='" + temp.Replace("screen_", "") + "' )";
+                            string temp0 = "select ip from classroom where (id='" + temp.Replace("login_", "") + "' )";
                             Console.WriteLine("SQL-in  " + temp0);
                             string sql = string.Format(temp0);
                             mycmd.CommandText = temp0;
@@ -281,6 +281,33 @@ namespace ConsoleApp2
                                 {
                                     if (socketTemp.Value.RemoteEndPoint.ToString() == ip_temp)
                                         socketTemp.Value.Send(Encoding.UTF8.GetBytes("login"));
+                                }
+                                i++;
+                            }
+                            sdr.Close();
+                            mycmd.Cancel();
+                            mycmd.Dispose();
+                        }
+                        if (temp.StartsWith("logout_"))//转发退签
+                        {
+                            string temp0 = "select ip from classroom where (id='" + temp.Replace("logout_", "") + "' )";
+                            Console.WriteLine("SQL-in  " + temp0);
+                            string sql = string.Format(temp0);
+                            mycmd.CommandText = temp0;
+                            mycmd.CommandType = CommandType.Text;
+                            if (localSql.State.ToString() != "Open")
+                            {
+                                localSql.Open();
+                            }
+                            MySqlDataReader sdr = mycmd.ExecuteReader();
+                            int i = 0;
+                            while (sdr.Read())
+                            {
+                                string ip_temp = sdr[0].ToString();
+                                foreach (var socketTemp in ClientConnectionItems)
+                                {
+                                    if (socketTemp.Value.RemoteEndPoint.ToString() == ip_temp)
+                                        socketTemp.Value.Send(Encoding.UTF8.GetBytes("logout"));
                                 }
                                 i++;
                             }
