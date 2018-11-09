@@ -163,6 +163,12 @@ namespace WinService
                                     member++;
                                     break;
                                 }
+                            case "logout":
+                                {
+                                    if (member>0)
+                                    member--;
+                                    break;
+                                }
                         }
 
                     }
@@ -274,7 +280,34 @@ namespace WinService
 
         private void sendFlag()//广播教室号和权限
         {
-            ClientSendMsg("flag_"+room_id.ToString()+"_"+flag_scr.ToString()+"_"+flag_cam.ToString());
+            string flag = "";
+            switch (flag_scr)
+            {
+                case true:
+                    {
+                        flag += "t";
+                        break;
+                    }
+                case false:
+                    {
+                        flag += "f";
+                        break;
+                    }
+            }
+            switch (flag_cam)
+            {
+                case true:
+                    {
+                        flag += "-t";
+                        break;
+                    }
+                case false:
+                    {
+                        flag += "-f";
+                        break;
+                    }
+            }
+            ClientSendMsg("flag_"+flag+comboBox2.SelectedItem.ToString());
         }
 
         public Form1()
@@ -330,7 +363,7 @@ namespace WinService
                 closeCam();
             }
             Thread.Sleep(2500);
-            //sendFlag();
+            sendFlag();
         }
 
         private void button1_Click(object sender, EventArgs e)//截图按钮
@@ -584,6 +617,8 @@ namespace WinService
             }
             button3.Enabled = true;
             button4.Enabled = false;
+            comboBox2.Enabled = true;
+            comboBox3.Enabled = true;
         }
    
     }

@@ -163,7 +163,7 @@ namespace ConsoleApp2
                         }         
                     }
                     else {
-                        if (temp.StartsWith("sql-"))
+                        if (temp.StartsWith("sql-"))//处理数据库命令
                         {
                             if (localSql.State == ConnectionState.Closed)
                             {
@@ -196,6 +196,10 @@ namespace ConsoleApp2
 
                                 i++;
                             }
+                            if (i == 0 && temp.StartsWith("select"))
+                            {
+                                resql = "$";
+                            }
                             Console.WriteLine(resql);
                             sdr.Close();
                             mycmd.Cancel();
@@ -203,7 +207,99 @@ namespace ConsoleApp2
                             socketServer.Send(Encoding.UTF8.GetBytes(resql));
                             //Thread.Sleep(100);
                         }
-                       
+                        if(temp.StartsWith("photo_"))//转发拍照指令
+                        {
+                            string temp0 = "select ip from classroom where (id='"+temp.Replace("photo_","")+"' )";
+                            Console.WriteLine("SQL-in  " + temp0);
+                            string sql = string.Format(temp0);
+                            mycmd.CommandText = temp0;
+                            mycmd.CommandType = CommandType.Text;
+                            if (localSql.State.ToString() != "Open")
+                            {
+                                localSql.Open();
+                            }
+                            MySqlDataReader sdr = mycmd.ExecuteReader();
+                            int i = 0;                            
+                            while (sdr.Read())
+                            {
+                                string ip_temp=sdr[0].ToString();
+                                foreach (var socketTemp in ClientConnectionItems)
+                                {
+                                    if(socketTemp.Value.RemoteEndPoint.ToString()==ip_temp)
+                                    socketTemp.Value.Send(Encoding.UTF8.GetBytes("photo"));
+                                }
+                                i++;
+                            }
+                            sdr.Close();
+                            mycmd.Cancel();
+                            mycmd.Dispose();
+                        }
+                        if (temp.StartsWith("screen_"))//转发截图指令
+                        {
+                            string temp0 = "select ip from classroom where (id='" + temp.Replace("screen_", "") + "' )";
+                            Console.WriteLine("SQL-in  " + temp0);
+                            string sql = string.Format(temp0);
+                            mycmd.CommandText = temp0;
+                            mycmd.CommandType = CommandType.Text;
+                            if (localSql.State.ToString() != "Open")
+                            {
+                                localSql.Open();
+                            }
+                            MySqlDataReader sdr = mycmd.ExecuteReader();
+                            int i = 0;
+                            while (sdr.Read())
+                            {
+                                string ip_temp = sdr[0].ToString();
+                                foreach (var socketTemp in ClientConnectionItems)
+                                {
+                                    if (socketTemp.Value.RemoteEndPoint.ToString() == ip_temp)
+                                        socketTemp.Value.Send(Encoding.UTF8.GetBytes("screen"));
+                                }
+                                i++;
+                            }
+                            sdr.Close();
+                            mycmd.Cancel();
+                            mycmd.Dispose();
+                        }
+                        if (temp.StartsWith("screen_"))//转发签到
+                        {
+                            string temp0 = "select ip from classroom where (id='" + temp.Replace("screen_", "") + "' )";
+                            Console.WriteLine("SQL-in  " + temp0);
+                            string sql = string.Format(temp0);
+                            mycmd.CommandText = temp0;
+                            mycmd.CommandType = CommandType.Text;
+                            if (localSql.State.ToString() != "Open")
+                            {
+                                localSql.Open();
+                            }
+                            MySqlDataReader sdr = mycmd.ExecuteReader();
+                            int i = 0;
+                            while (sdr.Read())
+                            {
+                                string ip_temp = sdr[0].ToString();
+                                foreach (var socketTemp in ClientConnectionItems)
+                                {
+                                    if (socketTemp.Value.RemoteEndPoint.ToString() == ip_temp)
+                                        socketTemp.Value.Send(Encoding.UTF8.GetBytes("login"));
+                                }
+                                i++;
+                            }
+                            sdr.Close();
+                            mycmd.Cancel();
+                            mycmd.Dispose();
+                        }
+                        if (temp.StartsWith("flag_"))//广播权限变更
+                        {
+                            string room_id_t = temp.Remove(0, 8);
+                            if (ClientConnectionItems.Count > 0)
+                            {
+                                foreach (var socketTemp in ClientConnectionItems)
+                                {
+
+                                    socketTemp.Value.Send(Encoding.UTF8.GetBytes(temp.Replace("flag_", "")));
+                                }
+                            }                                                 
+                        }
                     }
 
                     //将发送的字符串信息附加到文本框txtMsg上     
