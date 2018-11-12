@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Web;
 
 namespace WindowsFormsApp1
 {
@@ -22,6 +21,8 @@ namespace WindowsFormsApp1
 
         static bool flag_scr = true;
         static bool flag_cam = true;
+        static bool flash_scr = false;
+        static bool flash_cam = false;
 
         static bool newMsg = false;
         static string message = "";
@@ -38,7 +39,9 @@ namespace WindowsFormsApp1
         {
             ClientSendMsg("LoginStudent_" + room_id.ToString());
         }
-        public int startTCP() {
+
+        public int startTCP()//开启TCP链接
+        {
             try
             {
                 int port = 5500;
@@ -73,7 +76,8 @@ namespace WindowsFormsApp1
                 return -1;
             }
         }
-        public static void Recv()
+
+        public static void Recv()//接收指令和数据库返回值
         {
            
             //持续监听服务端发来的消息 
@@ -91,7 +95,7 @@ namespace WindowsFormsApp1
                     string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
                     Console.WriteLine(strRevMsg);
                     if (strRevMsg.StartsWith("f-t") || strRevMsg.StartsWith("t-f") ||//接收到权限变化指令
-                        strRevMsg.StartsWith("f-f") || strRevMsg.StartsWith("t-t"))
+                        strRevMsg.StartsWith("f-f") || strRevMsg.StartsWith("t-t")|| strRevMsg.StartsWith("fs") || strRevMsg.StartsWith("fc"))
                     {
                         if (strRevMsg.EndsWith(room_name))
                         {
@@ -123,11 +127,19 @@ namespace WindowsFormsApp1
                                         flag_cam = true;
                                         break;
                                     }
+                                case "fs$":
+                                    {
+                                        flash_scr = true;
+                                        break;
+                                    }
+                                case "fc$":
+                                    {
+                                        flash_cam = true;
+                                        break;
+                                    }
 
                             }
                         }
-                        //stage = 1;
-                        //ClientSendMsg("select id,name from classroom;");
                     }
                     else
                     {
@@ -148,8 +160,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        //发送字符信息到服务端的方法  
-        public static void ClientSendMsg(string sendMsg)
+        public static void ClientSendMsg(string sendMsg)//发送套接字方法
         {
             try
             {
@@ -166,6 +177,7 @@ namespace WindowsFormsApp1
             //将输入的内容字符串转换为机器可以识别的字节数组     
             
         }
+
         public bool Download(string url, string localfile)//下载文件方法
         {
             bool flag = false;
@@ -224,12 +236,13 @@ namespace WindowsFormsApp1
 
             return flag;
         }
-            public Form1()
+
+        public Form1()
         {
             InitializeComponent();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer1_Tick(object sender, EventArgs e)//时钟
         {
             label4.Text = DateTime.Now.ToLongDateString()+" "+DateTime.Now.ToLongTimeString();
         }
@@ -240,7 +253,7 @@ namespace WindowsFormsApp1
             
         }
 
-        private void Form1_Shown(object sender, EventArgs e)
+        private void Form1_Shown(object sender, EventArgs e)//初始化界面
         {
            if(-1!= startTCP())
             {
@@ -297,12 +310,12 @@ namespace WindowsFormsApp1
             
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)//发送截图命令
         {
             ClientSendMsg("screen_"+room_id);
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)//退出程序释放资源
         {
             Thread.Sleep(500);
             if (ThreadClient!=null && ThreadClient.IsAlive)
@@ -313,11 +326,9 @@ namespace WindowsFormsApp1
                 SocketClient.Close();
                 SocketClient.Dispose();
             }
-        }
+        }        
 
-        
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)//根据选择的学号加载姓名
         {
             textBox1.Text = "";
             newMsg = false;
@@ -337,7 +348,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)//根据选择的教室加载课程
         {
             textBox2.Text = "";
             newMsg = false;
@@ -357,7 +368,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)//签到按钮
         {
             if (!SocketClient.Connected)
             {
@@ -458,7 +469,7 @@ namespace WindowsFormsApp1
             button1.Enabled = false;
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void button4_Click(object sender, EventArgs e)//退签按钮，并释放套接字
         {
             ClientSendMsg("logout_" + room_id);
             Thread.Sleep(1000);
@@ -482,7 +493,7 @@ namespace WindowsFormsApp1
         
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)//发送拍照命令
         {
           
             ClientSendMsg("photo_"+room_id);
@@ -490,37 +501,65 @@ namespace WindowsFormsApp1
             
         }
 
-        private void timer2_Tick(object sender, EventArgs e)
+        private void timer2_Tick(object sender, EventArgs e)//刷新权限
         {
             button2.Enabled = flag_scr;
             button3.Enabled = flag_cam;
         }
 
-        private void label7_Click(object sender, EventArgs e)
+        private void button6_Click(object sender, EventArgs e)
         {
+            
 
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void timer3_Tick(object sender, EventArgs e)//刷新实时预览图
         {
-            try
+            if (flag_scr)
             {
-                string subPath = "D:\\ctyunclass\\temp";
-                if (false == System.IO.Directory.Exists(subPath))
+                try
                 {
-                    System.IO.Directory.CreateDirectory(subPath);
+                    string subPath = "D:\\ctyunclass\\temp";
+                    if (false == System.IO.Directory.Exists(subPath))
+                    {
+                        System.IO.Directory.CreateDirectory(subPath);
+                    }
+
+
+
+                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/src.jpg"), subPath + "/src.jpg"))
+
+                        pictureBox1.Image = Image.FromFile(subPath + "/src.jpg");
                 }
-               
-               
+                catch (Exception)
+                {
 
-                if (Download(System.Web.HttpUtility.UrlEncode("http://117.80.86.174:88/FILES/数据结构/src.jpg"), subPath + "/src.jpg"))
-
-                pictureBox1.Image = Image.FromFile(subPath + "/src.jpg");
+                    throw;
+                }
+                flash_scr = false;
             }
-            catch (Exception)
+            if (flash_cam)
             {
+                try
+                {
+                    string subPath = "D:\\ctyunclass\\temp";
+                    if (false == System.IO.Directory.Exists(subPath))
+                    {
+                        System.IO.Directory.CreateDirectory(subPath);
+                    }
 
-                throw;
+
+
+                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/src.jpg"), subPath + "/src.jpg"))
+
+                        pictureBox1.Image = Image.FromFile(subPath + "/src.jpg");
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+                flash_cam = false;
             }
             
         }

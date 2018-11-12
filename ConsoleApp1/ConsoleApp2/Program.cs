@@ -328,20 +328,6 @@ namespace ConsoleApp2
                             }                                                 
                         }
                     }
-
-                    //将发送的字符串信息附加到文本框txtMsg上     
-                    //Console.WriteLine("\r\n[客户端：" + socketServer.RemoteEndPoint + " 时间：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "]\r\n" + strSRecMsg);
-
-                    //Thread.Sleep(3000);
-                    
-                    ////发送客户端数据
-                    //if (ClientConnectionItems.Count > 0)
-                    //{
-                    //    foreach (var socketTemp in ClientConnectionItems)
-                    //    {
-                    //        socketTemp.Value.Send(Encoding.UTF8.GetBytes("[" + socketServer.RemoteEndPoint + "]：" + strSRecMsg));
-                    //    }
-                    //}
                 }
                 catch (Exception e)
                 {

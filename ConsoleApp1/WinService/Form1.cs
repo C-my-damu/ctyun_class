@@ -38,6 +38,7 @@ namespace WinService
         static string room_id = "";//教室码
         static string room_name = "";//教室名
         static string class_id = "";//课程码
+        static string class_name = "";//课程名
         static int member = 0;//签到人次
 
         static string message = "";//tcp取回的信息
@@ -48,28 +49,10 @@ namespace WinService
         private int Indexof = 0;//摄像头的当前选择项
 
         static Thread ThreadClient = null;//TCP线程
-        static Socket SocketClient = null;//TCP客户端
+        static Socket SocketClient1 = null;//TCP客户端
+        static TcpListener tcpListener = null;//TCP文件客户端
 
-        static ThreadStart threadStart = new ThreadStart(startUpload);//文件上传线程
-        Thread clock0 = new Thread(threadStart);
 
-        public static void startUpload()//上传文件线程，上传错误则抛出提示
-        {
-            int t = 0;
-            while (uploadFile("file2update") != 1&&t<10) {
-                t++;
-            };
-            if (t == 10) {
-                MessageBox.Show("文件上传失败，请检查网络连接");
-            }
-        }
-
-        public static int uploadFile(string file)//上传文件实体方法
-        {
-            //to do:获取时间，打时间戳，课程戳，写文件名，上传文件
-            //1成功0失败
-            return 1;
-        }
 
         public void pushButton1()
         {
@@ -87,23 +70,38 @@ namespace WinService
         {
             try
             {
-                int port = 5500;
+                int port1 = 5500;
+                int port2 = 6000;
                 string host = "127.0.0.1";//服务器端ip地址
                 IPAddress ip = IPAddress.Parse(host);
-                IPEndPoint ipe = new IPEndPoint(ip, port);
+                IPEndPoint ipe1 = new IPEndPoint(ip, port1);
+                IPEndPoint ipe2 = new IPEndPoint(ip, port2);
 
                 //定义一个套接字监听  
-                SocketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                SocketClient1 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                tcpListener = new TcpListener(ip, port2);
 
                 try
                 {
                     //客户端套接字连接到网络节点上，用的是Connect   
-                    SocketClient.Connect(ipe);
+                    SocketClient1.Connect(ipe1);                    
                 }
                 catch (Exception)
                 {
                     MessageBox.Show("连接失败！\r\n程序即将关闭");
                    // Thread.Sleep(1000);
+                    //
+                    return -1;
+                }
+                try
+                {
+                    //客户端套接字连接到网络节点上，用的是Connect   
+                    tcpListener.Start();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("文件服务连接失败！\r\n程序即将关闭");
+                    // Thread.Sleep(1000);
                     //
                     return -1;
                 }
@@ -129,6 +127,66 @@ namespace WinService
             return 1;
         }
 
+        public void SendFileFunc(string filePath,string fileName)
+        {
+            
+            while (true)
+            {
+                try
+                {
+                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                    if (tcpClient.Connected)
+                    {
+                        NetworkStream stream = tcpClient.GetStream();
+                        //string fileName = "testfile.rar";
+
+                        byte[] fileNameByte = Encoding.Unicode.GetBytes(fileName);
+                        byte[] filePathByte = Encoding.Unicode.GetBytes(filePath);
+
+                        byte[] fileNameLengthForValueByte = Encoding.Unicode.GetBytes(fileNameByte.Length.ToString("D11"));
+                        byte[] filePathLengthForValueByte = Encoding.Unicode.GetBytes(filePathByte.Length.ToString("D11"));
+                        byte[] fileAttributeByte1 = new byte[fileNameByte.Length + fileNameLengthForValueByte.Length];
+                        byte[] fileAttributeByte2 = new byte[filePathByte.Length + filePathLengthForValueByte.Length];
+
+                        fileNameLengthForValueByte.CopyTo(fileAttributeByte1, 0);  //文件名字符流的长度的字符流排在前面。
+
+
+                        fileNameByte.CopyTo(fileAttributeByte1, fileNameLengthForValueByte.Length);  //紧接着文件名的字符流
+
+                        filePathLengthForValueByte.CopyTo(fileAttributeByte2, 0);  //文件目录字符流的长度的字符流排在前面。
+
+
+                        filePathByte.CopyTo(fileAttributeByte2, filePathLengthForValueByte.Length);  //紧接着文件目录的字符流
+
+                        stream.Write(fileAttributeByte1, 0, fileAttributeByte1.Length);
+                        stream.Write(fileAttributeByte2, 0, fileAttributeByte2.Length);
+                        FileStream fileStrem = new FileStream(filePath + "\\" + fileName, FileMode.Open);
+
+                        int fileReadSize = 0;
+                        long fileLength = 0;
+                        while (fileLength < fileStrem.Length)
+                        {
+                            byte[] buffer = new byte[2048];
+                            fileReadSize = fileStrem.Read(buffer, 0, buffer.Length);
+                            stream.Write(buffer, 0, fileReadSize);
+                            fileLength += fileReadSize;
+
+                        }
+                        fileStrem.Flush();
+                        stream.Flush();
+                        fileStrem.Close();
+                        stream.Close();
+
+                        Console.WriteLine(string.Format("{0}文件发送成功", fileName));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+        }
+
         public static void Recv()//接收信息
         {
             
@@ -141,7 +199,7 @@ namespace WinService
                     byte[] arrRecvmsg = new byte[1024 * 1024];
 
                     //将客户端套接字接收到的数据存入内存缓冲区，并获取长度  
-                    int length = SocketClient.Receive(arrRecvmsg);
+                    int length = SocketClient1.Receive(arrRecvmsg);
 
                     //将套接字获取到的字符数组转换为人可以看懂的字符串  
                     string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
@@ -199,7 +257,7 @@ namespace WinService
             //调用客户端套接字发送字节数组  
             try
             {
-                SocketClient.Send(arrClientSendMsg);
+                SocketClient1.Send(arrClientSendMsg);
             }
             catch (Exception e)
             {
@@ -312,6 +370,26 @@ namespace WinService
             ClientSendMsg("flag_"+flag+room_name);
         }
 
+        public static void sendFlash(int a)//广播刷新预览
+        {
+            string flag = "";
+            switch (a)
+            {
+                case 1:
+                    {
+                        flag += "fs";
+                        break;
+                    }
+                case 2:
+                    {
+                        flag += "fc";
+                        break;
+                    }
+            }
+            
+            ClientSendMsg("flag_" + flag + room_name);
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -387,6 +465,7 @@ namespace WinService
                     System.IO.Directory.CreateDirectory(subPath);
                 }
                 b.Save(subPath + name + ".jpg");
+                //startUpload(subPath + name + ".jpg", "http://117.80.86.174:88/" + class_name + "/src.jpg");
             }
             catch (Exception)
             {
@@ -449,13 +528,13 @@ namespace WinService
             {
                 ThreadClient.Abort();
             }
-                if (SocketClient!=null&&SocketClient.Connected)
+                if (SocketClient1!=null&&SocketClient1.Connected)
                 {
                    // ClientSendMsg("close");
-                    SocketClient.Shutdown(SocketShutdown.Both);
+                    SocketClient1.Shutdown(SocketShutdown.Both);
 
-                    SocketClient.Close();
-                    SocketClient.Dispose();
+                    SocketClient1.Close();
+                    SocketClient1.Dispose();
                 }
 
                 videoSourcePlayer1.Stop();
@@ -520,7 +599,7 @@ namespace WinService
 
         private void button3_Click(object sender, EventArgs e)//上课按钮，将客户端注册到服务器
         {
-            if (!SocketClient.Connected)
+            if (!SocketClient1.Connected)
             {
                 Thread.Sleep(1000);
                 if (-1 == connectToCtyun())//若连接异常推出程序
@@ -539,7 +618,7 @@ namespace WinService
                 DialogResult dr = MessageBox.Show("当前教室：" + comboBox2.SelectedItem.ToString() + "\n\r当前课程：" + comboBox3.SelectedItem.ToString() + "\n\r是否确认？", "取消", MessageBoxButtons.OKCancel);
                 if (dr == DialogResult.OK)
                 {
-                    ClientSendMsg("sql- UPDATE `classroom` SET `ip` = '"+SocketClient.LocalEndPoint.ToString()+"', `class_now` = '"+comboBox3.SelectedItem.ToString()+"'where(name='"+comboBox2.SelectedItem.ToString()+"') ");
+                    ClientSendMsg("sql- UPDATE `classroom` SET `ip` = '"+SocketClient1.LocalEndPoint.ToString()+"', `class_now` = '"+comboBox3.SelectedItem.ToString()+"'where(name='"+comboBox2.SelectedItem.ToString()+"') ");
                     newMsg = false;
                     int t = 0;
                     ClientSendMsg("sql- select id from classroom where(name='" + comboBox2.SelectedItem.ToString() + "') ");
@@ -568,6 +647,7 @@ namespace WinService
                         Console.WriteLine("class_id:" + room_id + "\n\r");
                     }
                     room_name = comboBox2.SelectedItem.ToString();
+                    class_name = comboBox3.SelectedItem.ToString();
                     comboBox2.Enabled = false;
                     comboBox3.Enabled = false;
                 }
@@ -605,13 +685,13 @@ namespace WinService
             
             if (ThreadClient.IsAlive)
                 ThreadClient.Abort();
-            if (SocketClient.Connected)
+            if (SocketClient1.Connected)
             {
                 ClientSendMsg("close");
-                SocketClient.Shutdown(SocketShutdown.Both);
+                SocketClient1.Shutdown(SocketShutdown.Both);
 
-                SocketClient.Close();
-                SocketClient.Dispose();
+                SocketClient1.Close();
+                SocketClient1.Dispose();
             }
 
             videoSourcePlayer1.Stop();

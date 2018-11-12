@@ -46,25 +46,29 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.button5 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.button6 = new System.Windows.Forms.Button();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.treeView1 = new System.Windows.Forms.TreeView();
             this.label4 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.timer2 = new System.Windows.Forms.Timer(this.components);
-            this.treeView1 = new System.Windows.Forms.TreeView();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
             this.timer3 = new System.Windows.Forms.Timer(this.components);
-            this.button6 = new System.Windows.Forms.Button();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -240,6 +244,9 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.label10);
+            this.groupBox4.Controls.Add(this.label9);
+            this.groupBox4.Controls.Add(this.pictureBox3);
             this.groupBox4.Controls.Add(this.pictureBox2);
             this.groupBox4.Location = new System.Drawing.Point(270, 96);
             this.groupBox4.Name = "groupBox4";
@@ -247,6 +254,14 @@
             this.groupBox4.TabIndex = 10;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "截图预览";
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Location = new System.Drawing.Point(11, 34);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(629, 358);
+            this.pictureBox2.TabIndex = 0;
+            this.pictureBox2.TabStop = false;
             // 
             // groupBox5
             // 
@@ -263,6 +278,63 @@
             this.groupBox5.TabIndex = 11;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "文件浏览";
+            // 
+            // button6
+            // 
+            this.button6.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button6.Location = new System.Drawing.Point(782, 444);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(189, 43);
+            this.button6.TabIndex = 11;
+            this.button6.Text = "查看文件";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // label8
+            // 
+            this.label8.AutoEllipsis = true;
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(719, 354);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(46, 27);
+            this.label8.TabIndex = 4;
+            this.label8.Text = "null";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.Location = new System.Drawing.Point(719, 318);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(92, 27);
+            this.label7.TabIndex = 3;
+            this.label7.Text = "当前目录";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(719, 37);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(92, 27);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "文件预览";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(724, 77);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(318, 208);
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
+            // 
+            // treeView1
+            // 
+            this.treeView1.Location = new System.Drawing.Point(23, 37);
+            this.treeView1.Name = "treeView1";
+            this.treeView1.Size = new System.Drawing.Size(681, 476);
+            this.treeView1.TabIndex = 0;
             // 
             // label4
             // 
@@ -286,74 +358,38 @@
             this.timer2.Interval = 1000;
             this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
-            // treeView1
-            // 
-            this.treeView1.Location = new System.Drawing.Point(23, 37);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(681, 476);
-            this.treeView1.TabIndex = 0;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(724, 77);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(318, 208);
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(719, 37);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(92, 27);
-            this.label6.TabIndex = 2;
-            this.label6.Text = "文件预览";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.Location = new System.Drawing.Point(719, 318);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(92, 27);
-            this.label7.TabIndex = 3;
-            this.label7.Text = "当前目录";
-            this.label7.Click += new System.EventHandler(this.label7_Click);
-            // 
-            // label8
-            // 
-            this.label8.AutoEllipsis = true;
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(719, 354);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(46, 27);
-            this.label8.TabIndex = 4;
-            this.label8.Text = "null";
-            // 
             // timer3
             // 
             this.timer3.Interval = 1000;
+            this.timer3.Tick += new System.EventHandler(this.timer3_Tick);
             // 
-            // button6
+            // pictureBox3
             // 
-            this.button6.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button6.Location = new System.Drawing.Point(782, 444);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(189, 43);
-            this.button6.TabIndex = 11;
-            this.button6.Text = "查看文件";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
+            this.pictureBox3.Location = new System.Drawing.Point(413, 155);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(629, 358);
+            this.pictureBox3.TabIndex = 1;
+            this.pictureBox3.TabStop = false;
             // 
-            // pictureBox2
+            // label9
             // 
-            this.pictureBox2.Location = new System.Drawing.Point(11, 34);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(713, 410);
-            this.pictureBox2.TabIndex = 0;
-            this.pictureBox2.TabStop = false;
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label9.Location = new System.Drawing.Point(14, 403);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(98, 25);
+            this.label9.TabIndex = 2;
+            this.label9.Text = "截图预览↑";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label10.Location = new System.Drawing.Point(944, 117);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(98, 25);
+            this.label10.TabIndex = 3;
+            this.label10.Text = "拍照预览↓";
             // 
             // Form1
             // 
@@ -364,8 +400,8 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
+            this.Controls.Add(this.groupBox5);
             this.Name = "Form1";
             this.Text = "天翼云智慧课堂学生端";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -376,10 +412,12 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -416,6 +454,9 @@
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Timer timer3;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.PictureBox pictureBox3;
     }
 }
 
