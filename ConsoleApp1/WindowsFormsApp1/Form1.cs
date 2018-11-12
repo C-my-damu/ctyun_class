@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Web;
 
 namespace WindowsFormsApp1
 {
@@ -29,6 +31,7 @@ namespace WindowsFormsApp1
         static string student_id = "";
         static string class_id = "";
         static string class_name = "";
+        static string tempFile = "";
 
         
         private void sendLogin()//广播教室号登陆
@@ -163,7 +166,65 @@ namespace WindowsFormsApp1
             //将输入的内容字符串转换为机器可以识别的字节数组     
             
         }
-        public Form1()
+        public bool Download(string url, string localfile)//下载文件方法
+        {
+            bool flag = false;
+            long startPosition = 0; // 上次下载的文件起始位置
+            FileStream writeStream; // 写入本地文件流对象
+
+            // 判断要下载的文件夹是否存在
+            if (File.Exists(localfile))
+            {
+
+                writeStream = File.OpenWrite(localfile);             // 存在则打开要下载的文件
+                startPosition = writeStream.Length;                  // 获取已经下载的长度
+                writeStream.Seek(startPosition, SeekOrigin.Current); // 本地文件写入位置定位
+            }
+            else
+            {
+                writeStream = new FileStream(localfile, FileMode.Create);// 文件不保存创建一个文件
+                startPosition = 0;
+            }
+
+
+            try
+            {
+                HttpWebRequest myRequest = (HttpWebRequest)HttpWebRequest.Create(url);// 打开网络连接
+
+                if (startPosition > 0)
+                {
+                    myRequest.AddRange((int)startPosition);// 设置Range值,与上面的writeStream.Seek用意相同,是为了定义远程文件读取位置
+                }
+
+
+                Stream readStream = myRequest.GetResponse().GetResponseStream();// 向服务器请求,获得服务器的回应数据流
+
+
+                byte[] btArray = new byte[512];// 定义一个字节数据,用来向readStream读取内容和向writeStream写入内容
+                int contentSize = readStream.Read(btArray, 0, btArray.Length);// 向远程文件读第一次
+
+                while (contentSize > 0)// 如果读取长度大于零则继续读
+                {
+                    writeStream.Write(btArray, 0, contentSize);// 写入本地文件
+                    contentSize = readStream.Read(btArray, 0, btArray.Length);// 继续向远程文件读取
+                }
+
+                //关闭流
+                writeStream.Close();
+                readStream.Close();
+
+                flag = true;        //返回true下载成功
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                writeStream.Close();
+                flag = false;       //返回false下载失败
+            }
+
+            return flag;
+        }
+            public Form1()
         {
             InitializeComponent();
         }
@@ -433,6 +494,35 @@ namespace WindowsFormsApp1
         {
             button2.Enabled = flag_scr;
             button3.Enabled = flag_cam;
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string subPath = "D:\\ctyunclass\\temp";
+                if (false == System.IO.Directory.Exists(subPath))
+                {
+                    System.IO.Directory.CreateDirectory(subPath);
+                }
+               
+               
+
+                if (Download(System.Web.HttpUtility.UrlEncode("http://117.80.86.174:88/FILES/数据结构/src.jpg"), subPath + "/src.jpg"))
+
+                pictureBox1.Image = Image.FromFile(subPath + "/src.jpg");
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
     }
 }
