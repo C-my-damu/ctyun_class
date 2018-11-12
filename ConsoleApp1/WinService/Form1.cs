@@ -127,7 +127,7 @@ namespace WinService
             return 1;
         }
 
-        public void SendFileFunc(string filePath,string fileName)
+        public void SendFile(string filePath,string fileName)//上传文件方法
         {
             
             while (true)
@@ -150,16 +150,16 @@ namespace WinService
 
                         fileNameLengthForValueByte.CopyTo(fileAttributeByte1, 0);  //文件名字符流的长度的字符流排在前面。
 
-
                         fileNameByte.CopyTo(fileAttributeByte1, fileNameLengthForValueByte.Length);  //紧接着文件名的字符流
 
                         filePathLengthForValueByte.CopyTo(fileAttributeByte2, 0);  //文件目录字符流的长度的字符流排在前面。
 
-
                         filePathByte.CopyTo(fileAttributeByte2, filePathLengthForValueByte.Length);  //紧接着文件目录的字符流
 
                         stream.Write(fileAttributeByte1, 0, fileAttributeByte1.Length);
-                        stream.Write(fileAttributeByte2, 0, fileAttributeByte2.Length);
+
+                        stream.Write(fileAttributeByte2, 0, fileAttributeByte2.Length);//将文件头写入文件流
+
                         FileStream fileStrem = new FileStream(filePath + "\\" + fileName, FileMode.Open);
 
                         int fileReadSize = 0;
@@ -170,7 +170,6 @@ namespace WinService
                             fileReadSize = fileStrem.Read(buffer, 0, buffer.Length);
                             stream.Write(buffer, 0, fileReadSize);
                             fileLength += fileReadSize;
-
                         }
                         fileStrem.Flush();
                         stream.Flush();
@@ -183,6 +182,62 @@ namespace WinService
                 catch (Exception ex)
                 {
                     throw;
+                }
+            }
+        }
+
+        private void ReceiveFileFunc(object obj)
+        {
+            IPEndPoint ipEndPoint = obj as IPEndPoint;
+            TcpClient tcpClient = new TcpClient();
+            try
+            {
+                tcpClient.Connect(ipEndPoint);
+            }
+            catch
+            {
+                Console.WriteLine("连接失败，找不到服务器！");
+            }
+
+            if (tcpClient.Connected)
+            {
+
+                NetworkStream stream = tcpClient.GetStream();
+                if (stream != null)
+                {
+
+                    byte[] fileNameLengthForValueByte = Encoding.Unicode.GetBytes((256).ToString("D11"));
+                    byte[] fileNameLengByte = new byte[1024];
+                    int fileNameLengthSize = stream.Read(fileNameLengByte, 0, fileNameLengthForValueByte.Length);
+                    string fileNameLength = Encoding.Unicode.GetString(fileNameLengByte, 0, fileNameLengthSize);
+                    Console.WriteLine("文件名字符流的长度为：" + fileNameLength);
+
+                    int fileNameLengthNum = Convert.ToInt32(fileNameLength);
+                    byte[] fileNameByte = new byte[fileNameLengthNum];
+
+                    int fileNameSize = stream.Read(fileNameByte, 0, fileNameLengthNum);
+                    string fileName = Encoding.Unicode.GetString(fileNameByte, 0, fileNameSize);
+                    Console.WriteLine("文件名为：" + fileName);
+
+                    string dirPath = Application.StartupPath + "\\WebFile";
+                    if (!Directory.Exists(dirPath))
+                    {
+                        Directory.CreateDirectory(dirPath);
+                    }
+                    FileStream fileStream = new FileStream(dirPath + "\\" + fileName, FileMode.Create, FileAccess.Write);
+                    int fileReadSize = 0;
+                    byte[] buffer = new byte[2048];
+                    while ((fileReadSize = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        fileStream.Write(buffer, 0, fileReadSize);
+
+                    }
+                    fileStream.Flush();
+                    fileStream.Close();
+                    stream.Flush();
+                    stream.Close();
+                    tcpClient.Close();
+                    Console.WriteLine("接收成功");
                 }
             }
         }
@@ -465,6 +520,7 @@ namespace WinService
                     System.IO.Directory.CreateDirectory(subPath);
                 }
                 b.Save(subPath + name + ".jpg");
+                SendFile(subPath, name + ".jpg");
                 //startUpload(subPath + name + ".jpg", "http://117.80.86.174:88/" + class_name + "/src.jpg");
             }
             catch (Exception)
@@ -500,6 +556,7 @@ namespace WinService
                         System.IO.Directory.CreateDirectory(subPath);
                     }
                     bb.Save(subPath + name + ".jpg");
+                    SendFile(subPath, name + ".jpg");
                     pictureBox2.Visible = true;
                     pictureBox2.Image = b;
                    
