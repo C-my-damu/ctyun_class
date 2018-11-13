@@ -208,16 +208,29 @@ namespace WinService
 
                     byte[] fileNameLengthForValueByte = Encoding.Unicode.GetBytes((256).ToString("D11"));
                     byte[] fileNameLengByte = new byte[1024];
+                    byte[] filePathLengByte = new byte[1024];
                     int fileNameLengthSize = stream.Read(fileNameLengByte, 0, fileNameLengthForValueByte.Length);
                     string fileNameLength = Encoding.Unicode.GetString(fileNameLengByte, 0, fileNameLengthSize);
+                   
                     Console.WriteLine("文件名字符流的长度为：" + fileNameLength);
 
                     int fileNameLengthNum = Convert.ToInt32(fileNameLength);
-                    byte[] fileNameByte = new byte[fileNameLengthNum];
+                    byte[] fileNameByte = new byte[fileNameLengthNum];                    
 
                     int fileNameSize = stream.Read(fileNameByte, 0, fileNameLengthNum);
                     string fileName = Encoding.Unicode.GetString(fileNameByte, 0, fileNameSize);
                     Console.WriteLine("文件名为：" + fileName);
+
+                    int filePathLengthSize = stream.Read(filePathLengByte, 0, fileNameLengthForValueByte.Length);
+                    string filePathLength = Encoding.Unicode.GetString(filePathLengByte, 0, filePathLengthSize);
+
+                    int filePathLengthNum = Convert.ToInt32(filePathLength);
+                    byte[] filePathByte = new byte[filePathLengthNum];
+                    Console.WriteLine("文件路径字符流的长度为：" + fileNameLength);
+
+                    int filePathSize = stream.Read(filePathByte, 0, filePathLengthNum);
+                    string filePath = Encoding.Unicode.GetString(filePathByte, 0, filePathSize);
+                    Console.WriteLine("文件路径为：" + fileName);
 
                     string dirPath = Application.StartupPath + "\\WebFile";
                     if (!Directory.Exists(dirPath))
