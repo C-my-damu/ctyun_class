@@ -42,10 +42,11 @@ namespace WindowsFormsApp2
         }
         private void rev(object obj)//接收文件并分类归档
         {
-            TcpClient tcpClient = (TcpClient)obj;
-            while (tcpClient.Connected)
+            TcpClient tcpClient = obj as TcpClient;
+            int t = 0;
+            while (true)
             {
-                TxtReceiveAddContent(tcpClient.Connected.ToString());
+                //TxtReceiveAddContent(tcpClient.Connected.ToString());
                 if (tcpClient.Connected)
                 {
                     try
@@ -102,26 +103,30 @@ namespace WindowsFormsApp2
                             fileStream.Close();
                             stream.Flush();
                             stream.Close();
-                            //tcpClient.Close();
+                            //stream.Dispose();
+                            tcpClient.Close();
                             TxtReceiveAddContent("接收成功");
                         }
                     }
                     catch (Exception)
                     {
-                        tcpClient.Close();
-                        TxtReceiveAddContent("断开连接");
-                        throw;
+                        //tcpClient.Close();
+                        TxtReceiveAddContent(t.ToString()+"断开连接");
+                       // throw;
                     }
                     
                     
                 }
                 else
                 {
-                    
+                    tcpClient.Close();
+                    tcpClient.Dispose();
+                    break;
+
                 }
-            }
-            tcpClient.Close();
             
+            }
+            TxtReceiveAddContent(t.ToString() + "断开连接,进程结束");
         }
         private void ReceiveFileFunc()//接受请求并启动接收文件线程
         {
@@ -154,6 +159,11 @@ namespace WindowsFormsApp2
             Thread.Sleep(500);
             
             
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
 
         }
     }

@@ -45,7 +45,13 @@ namespace WinService
 
         static Thread ThreadClient = null;//TCP线程
         static Socket SocketClient1 = null;//TCP客户端
-        static TcpClient tcpListener = null;//TCP文件客户端
+        //static TcpClient tcpListener = null;//TCP文件客户端
+
+        static int port1 = 5500;
+        static int port2 = 6000;
+        static string host = "117.80.86.174";//服务器端ip地址
+        static string host2 = "127.0.0.1";//本地调试用ip
+        
 
 
 
@@ -65,16 +71,14 @@ namespace WinService
         {
             try
             {
-                int port1 = 5500;
-                int port2 = 6000;
-                string host = "117.80.86.174";//服务器端ip地址
                 IPAddress ip = IPAddress.Parse(host);
+                IPAddress ip2 = IPAddress.Parse(host2);
                 IPEndPoint ipe1 = new IPEndPoint(ip, port1);
-                IPEndPoint ipe2 = new IPEndPoint(ip, port2);
+                IPEndPoint ipe2 = new IPEndPoint(ip2, port2);
 
                 //定义一个套接字监听  
                 SocketClient1 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                tcpListener = new TcpClient();
+                
 
                 try
                 {                     
@@ -85,17 +89,17 @@ namespace WinService
                     MessageBox.Show("连接失败！\r\n程序即将关闭");                
                     return -1;
                 }
-                try
-                {     
-                    tcpListener.Connect(ipe2);
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("文件服务连接失败！\r\n程序即将关闭");
-                    // Thread.Sleep(1000);
-                    //
-                    return -1;
-                }
+                //try
+                //{     
+                //    tcpListener.Connect(ipe2);
+                //}
+                //catch (Exception)
+                //{
+                //    MessageBox.Show("文件服务连接失败！\r\n程序即将关闭");
+                //    // Thread.Sleep(1000);
+                //    //
+                //    return -1;
+                //}
 
                 ThreadClient = new Thread(Recv);
                 ThreadClient.IsBackground = true;
@@ -121,9 +125,28 @@ namespace WinService
         public void SendFile(string filePath,string fileName)//上传文件方法
         {
 
-
+            TcpClient tcpListener = new TcpClient();
             try
             {
+               
+                IPAddress ip = IPAddress.Parse(host);
+                //IPAddress ip2 = IPAddress.Parse(host2);
+                IPEndPoint ipe1 = new IPEndPoint(ip, port2);
+                //IPEndPoint ipe2 = new IPEndPoint(ip2, port2);
+               
+                try
+                {
+                    tcpListener.Connect(ipe1);
+                    Thread.Sleep(200);
+                    //MessageBox.Show(tcpListener.Connected.ToString());
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("文件上传异常\n\r"+e.ToString());
+                }
+
+
+
 
                 if (tcpListener.Connected)
                 {
@@ -161,18 +184,21 @@ namespace WinService
                         fileLength += fileReadSize;
                     }
                     fileStrem.Flush();
+                    
                     stream.Flush();
                     fileStrem.Close();
                     stream.Close();
-
+                    stream.Dispose();
                     Console.WriteLine(string.Format("{0}文件发送成功", fileName));
                 }
+                
             }
             catch (Exception ex)
             {
                 throw;
             }
-
+            tcpListener.Close();
+            tcpListener.Dispose();
         }
 
         //private void ReceiveFileFunc(object obj)

@@ -46,6 +46,7 @@ namespace WindowsFormsApp1
             {
                 int port = 5500;
                 string host = "117.80.86.174";//服务器端ip地址
+                string host2 = "127.0.0.1";//本地调试用ip
                 IPAddress ip = IPAddress.Parse(host);
                 IPEndPoint ipe = new IPEndPoint(ip, port);
                 SocketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
