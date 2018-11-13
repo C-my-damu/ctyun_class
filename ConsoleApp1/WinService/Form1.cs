@@ -24,12 +24,7 @@ using System.Net;
 namespace WinService
 {
     public partial class Form1 : Form
-    {
-
-        static string filepath_scr = "";//待上传截屏文件的文件目录
-        static string filepath_cam = "";//待上传照片文件的文件目录
-     
-        
+    {          
         static bool flag_scr =true;//截屏权限
         static bool flag_cam = false;//相机权限
         static bool do_scr = false;//截屏请求
@@ -226,13 +221,19 @@ namespace WinService
 
                     int filePathLengthNum = Convert.ToInt32(filePathLength);
                     byte[] filePathByte = new byte[filePathLengthNum];
-                    Console.WriteLine("文件路径字符流的长度为：" + fileNameLength);
+                    Console.WriteLine("文件路径字符流的长度为：" + filePathLength);
 
                     int filePathSize = stream.Read(filePathByte, 0, filePathLengthNum);
                     string filePath = Encoding.Unicode.GetString(filePathByte, 0, filePathSize);
-                    Console.WriteLine("文件路径为：" + fileName);
+                    Console.WriteLine("文件路径为：" + filePath);
 
-                    string dirPath = Application.StartupPath + "\\WebFile";
+                    string pathTemp = "";
+                    if(filePath.StartsWith("D:\\ctyunclass\\"))
+                    {
+                        pathTemp = filePath.Replace("D:\\ctyunclass\\", "D:\\FILES");
+
+                    }
+                    string dirPath = pathTemp;
                     if (!Directory.Exists(dirPath))
                     {
                         Directory.CreateDirectory(dirPath);
@@ -527,13 +528,13 @@ namespace WinService
             g.CopyFromScreen(0, 0, 0, 0, new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height));
             try
             {
-                string subPath = "D:/ctyunclass/" + comboBox3.SelectedItem.ToString() + "/src/"+date+"/";
+                string subPath = "D:\\ctyunclass\\" + comboBox3.SelectedItem.ToString() + "\\temp\\";
                 if (false == System.IO.Directory.Exists(subPath))
                 {
                     System.IO.Directory.CreateDirectory(subPath);
                 }
-                b.Save(subPath + name + ".jpg");
-                SendFile(subPath, name + ".jpg");
+                b.Save(subPath +  "src.jpg");
+                SendFile(subPath,  "src.jpg");
                 //startUpload(subPath + name + ".jpg", "http://117.80.86.174:88/" + class_name + "/src.jpg");
             }
             catch (Exception)
@@ -563,15 +564,16 @@ namespace WinService
                 Bitmap bb = ResizeUsingEmguCV(b, 1280, 720);
                 try
                 {
-                    string subPath = "D:/ctyunclass/" + comboBox3.SelectedItem.ToString() + "/pic/" + date + "/";
+                    string subPath = "D:\\ctyunclass\\" + comboBox3.SelectedItem.ToString() + "\\temp\\";
                     if (false == System.IO.Directory.Exists(subPath))
                     {
                         System.IO.Directory.CreateDirectory(subPath);
                     }
-                    bb.Save(subPath + name + ".jpg");
-                    SendFile(subPath, name + ".jpg");
+                    bb.Save(subPath  + "pic.jpg");
+                    SendFile(subPath,  "pic.jpg");
                     pictureBox2.Visible = true;
                     pictureBox2.Image = b;
+                   
                    
                    // videoSourcePlayer1.Stop();
                     videoSourcePlayer1.Visible = false;                   
