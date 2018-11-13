@@ -67,7 +67,7 @@ namespace WinService
             {
                 int port1 = 5500;
                 int port2 = 6000;
-                string host = "127.0.0.1";//服务器端ip地址
+                string host = "117.80.86.174";//服务器端ip地址
                 IPAddress ip = IPAddress.Parse(host);
                 IPEndPoint ipe1 = new IPEndPoint(ip, port1);
                 IPEndPoint ipe2 = new IPEndPoint(ip, port2);
@@ -621,20 +621,15 @@ namespace WinService
                // Thread.Sleep(1000);
                 Application.Exit();
             }
-            Thread.Sleep(1000);
-            //ClientSendMsg("room");
-        }//窗体控件初始化
-
-        private void comboBox2_DropDown(object sender, EventArgs e)//选择教室
-        {
+            Thread.Sleep(100);
             comboBox2.Items.Clear();
             newMsg = false;
             Console.WriteLine(newMsg.ToString());
             int t = 0;
             ClientSendMsg("sql-select name from classroom;");
-            while (!newMsg&&t<100)
+            while (!newMsg && t < 100)
             {
-                Thread.Sleep(50);             
+                Thread.Sleep(50);
                 t++;
             }
             if (t < 100)
@@ -642,18 +637,15 @@ namespace WinService
                 string[] a = message.Split('$');
                 comboBox2.Items.AddRange(a);
             }
-        }
 
-        private void comboBox3_DropDown(object sender, EventArgs e)//课程下拉菜单
-        {
             comboBox3.Items.Clear();
             newMsg = false;
             Console.WriteLine(newMsg.ToString());
-            int t = 0;
+            t = 0;
             ClientSendMsg("sql-select name from class;");
             while (!newMsg && t < 100)
             {
-                Thread.Sleep(50);              
+                Thread.Sleep(50);
                 t++;
             }
             if (t < 100)
@@ -662,7 +654,7 @@ namespace WinService
                 comboBox3.Items.AddRange(a);
             }
         }
-
+        
         private void button3_Click(object sender, EventArgs e)//上课按钮，将客户端注册到服务器
         {
             if (!SocketClient1.Connected)
@@ -684,7 +676,9 @@ namespace WinService
                 DialogResult dr = MessageBox.Show("当前教室：" + comboBox2.SelectedItem.ToString() + "\n\r当前课程：" + comboBox3.SelectedItem.ToString() + "\n\r是否确认？", "取消", MessageBoxButtons.OKCancel);
                 if (dr == DialogResult.OK)
                 {
-                    ClientSendMsg("sql- UPDATE `classroom` SET `ip` = '"+SocketClient1.LocalEndPoint.ToString()+"', `class_now` = '"+comboBox3.SelectedItem.ToString()+"'where(name='"+comboBox2.SelectedItem.ToString()+"') ");
+                    string tempIP = string.Empty;
+                    
+                    ClientSendMsg("sql- UPDATE `classroom` SET `ip` = '!tempIP!', `class_now` = '"+comboBox3.SelectedItem.ToString()+"'where(name='"+comboBox2.SelectedItem.ToString()+"') ");
                     newMsg = false;
                     int t = 0;
                     ClientSendMsg("sql- select id from classroom where(name='" + comboBox2.SelectedItem.ToString() + "') ");

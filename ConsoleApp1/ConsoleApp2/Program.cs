@@ -17,7 +17,7 @@ namespace ConsoleApp2
         static Socket SocketWatch = null;
         //定义一个集合，存储客户端信息
         static Dictionary<string, Socket> ClientConnectionItems = new Dictionary<string, Socket> { };
-        static MySqlConnection localSql = new MySqlConnection("Database=ctyun_class;Data Source=117.80.86.174;User Id=pc-test;Password=damu19950313_");
+        static MySqlConnection localSql = new MySqlConnection("Database=ctyun_class;Data Source=127.0.0.1;User Id=pc-test;Password=damu19950313_");
         static void Main(string[] args)
         {
             //MySqlConnection localSql = null;
@@ -178,6 +178,7 @@ namespace ConsoleApp2
                                 }
                             }
                             temp = temp.Replace("sql-", "");
+                            temp = temp.Replace("!tempIP!", socketServer.RemoteEndPoint.ToString());
                             Console.WriteLine("SQL  " + temp);
                             string sql = string.Format(temp);
                             mycmd.CommandText = temp;

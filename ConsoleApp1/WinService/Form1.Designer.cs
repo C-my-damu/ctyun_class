@@ -82,7 +82,7 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(164, 29);
             this.comboBox2.TabIndex = 4;
-            this.comboBox2.DropDown += new System.EventHandler(this.comboBox2_DropDown);
+            
             // 
             // comboBox3
             // 
@@ -92,7 +92,7 @@
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(164, 29);
             this.comboBox3.TabIndex = 5;
-            this.comboBox3.DropDown += new System.EventHandler(this.comboBox3_DropDown);
+            
             // 
             // pictureBox1
             // 

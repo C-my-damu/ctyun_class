@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace WindowsFormsApp2
 {
     public partial class Form1 : Form
     {
+        static TcpListener tcpListener = null;
         public delegate void TxtReceiveAddContentEventHandler(string txtValue);
         public void TxtReceiveAddContent(string txtValue)
         {
@@ -38,10 +40,12 @@ namespace WindowsFormsApp2
         {
             
         }
-        private void rev(object obj)
+        private void rev(object obj)//接收文件并分类归档
         {
             TcpClient tcpClient = (TcpClient)obj;
-            while (true) {
+            while (tcpClient.Connected)
+            {
+                TxtReceiveAddContent(tcpClient.Connected.ToString());
                 if (tcpClient.Connected)
                 {
                     try
@@ -79,8 +83,7 @@ namespace WindowsFormsApp2
                             string pathTemp = "";
                             if (filePath.StartsWith("D:\\ctyunclass\\"))
                             {
-                                pathTemp = filePath.Replace("D:\\ctyunclass\\", "D:\\FILES");
-
+                                pathTemp = filePath.Replace("D:\\ctyunclass\\", "D:\\FILES\\");
                             }
                             string dirPath = pathTemp;
                             if (!Directory.Exists(dirPath))
@@ -99,27 +102,32 @@ namespace WindowsFormsApp2
                             fileStream.Close();
                             stream.Flush();
                             stream.Close();
-                            tcpClient.Close();
+                            //tcpClient.Close();
                             TxtReceiveAddContent("接收成功");
                         }
                     }
                     catch (Exception)
                     {
-
+                        tcpClient.Close();
+                        TxtReceiveAddContent("断开连接");
                         throw;
                     }
                     
                     
                 }
+                else
+                {
+                    
+                }
             }
+            tcpClient.Close();
+            
         }
-        private void ReceiveFileFunc(object obj)
+        private void ReceiveFileFunc()//接受请求并启动接收文件线程
         {
-            TcpListener tcpListener = obj as TcpListener;
             TcpClient tcpClient = null;
             while (true)
-            {
-                
+            {               
                 try
                 {
                     tcpClient = tcpListener.AcceptTcpClient();
@@ -135,14 +143,18 @@ namespace WindowsFormsApp2
             }
         }
 
-        private void Form1_Shown(object sender, EventArgs e)
+        private void Form1_Shown(object sender, EventArgs e)//程序启动，拉起SQL后台
         {
-            TcpListener tcpListener = new TcpListener(IPAddress.Any, 6000);
+            tcpListener = new TcpListener(IPAddress.Any, 6000);
             tcpListener.Start();
             txtReceive.Text = "开始侦听...";
             Thread thread = new Thread(ReceiveFileFunc);
-            thread.Start(tcpListener);
+            thread.Start();
             thread.IsBackground = true;
+            Thread.Sleep(500);
+            
+            
+
         }
     }
 }

@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp3", "ConsoleApp3\
 		{1FF51732-EA1E-476D-B87A-3ECB5B39F60C} = {1FF51732-EA1E-476D-B87A-3ECB5B39F60C}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp2", "WindowsFormsApp2\WindowsFormsApp2.csproj", "{ACB07244-D2D1-4495-8F60-4238F5CD7881}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileService", "WindowsFormsApp2\FileService.csproj", "{ACB07244-D2D1-4495-8F60-4238F5CD7881}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

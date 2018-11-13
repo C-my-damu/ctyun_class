@@ -45,7 +45,7 @@ namespace WindowsFormsApp1
             try
             {
                 int port = 5500;
-                string host = "127.0.0.1";//服务器端ip地址
+                string host = "117.80.86.174";//服务器端ip地址
                 IPAddress ip = IPAddress.Parse(host);
                 IPEndPoint ipe = new IPEndPoint(ip, port);
                 SocketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -389,7 +389,10 @@ namespace WindowsFormsApp1
                 DialogResult dr = MessageBox.Show("学号：" + comboBox1.SelectedItem.ToString()+"  姓名："+textBox1.Text + "\n\r教室：" + comboBox2.SelectedItem.ToString()+"  课程："+textBox2.Text + "\n\r是否确认？", "取消", MessageBoxButtons.OKCancel);
                 if (dr == DialogResult.OK)
                 {
-                    ClientSendMsg("sql- UPDATE `student` SET `ip` = '" + SocketClient.LocalEndPoint.ToString() + "'where(name='" + textBox1.Text + "') ");//注册学生端当前IP
+                    string tempIP = string.Empty;
+                    if (System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.Length > 1)
+                        tempIP = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList[1].ToString();
+                    ClientSendMsg("sql- UPDATE `student` SET `ip` =  '!tempIP!'where(name='" + textBox1.Text + "') ");//注册学生端当前IP
                     newMsg = false;
                     int t = 0;
                     ClientSendMsg("sql- select id from student where(classnumber='" + comboBox1.SelectedItem.ToString() + "') ");//获得当前学生id
@@ -453,6 +456,7 @@ namespace WindowsFormsApp1
                     ClientSendMsg("login_" + room_id);//签到
                     class_name = textBox2.Text;
                     room_name = comboBox2.SelectedItem.ToString();
+                    timer3.Enabled = true;
                     comboBox1.Enabled = false;
                     comboBox2.Enabled = false;
                 }
@@ -471,6 +475,7 @@ namespace WindowsFormsApp1
 
         private void button4_Click(object sender, EventArgs e)//退签按钮，并释放套接字
         {
+            timer3.Enabled = false;
             ClientSendMsg("logout_" + room_id);
             Thread.Sleep(1000);
             if (ThreadClient.IsAlive)
@@ -527,9 +532,12 @@ namespace WindowsFormsApp1
 
 
 
-                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/src.jpg"), subPath + "/src.jpg"))
-
-                        pictureBox1.Image = Image.FromFile(subPath + "/src.jpg");
+                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/temp/src.jpg"), subPath + "/src.jpg"))
+                    {
+                        Thread.Sleep(1000);
+                        pictureBox2.Image = Image.FromFile(subPath + "/src.jpg");
+                    }
+                        
                 }
                 catch (Exception)
                 {
@@ -550,9 +558,12 @@ namespace WindowsFormsApp1
 
 
 
-                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/src.jpg"), subPath + "/src.jpg"))
-
-                        pictureBox1.Image = Image.FromFile(subPath + "/src.jpg");
+                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/temp/src.jpg"), subPath + "/cam.jpg"))
+                    {
+                        Thread.Sleep(1000);
+                        pictureBox3.Image = Image.FromFile(subPath + "/cam.jpg");
+                    }
+                        
                 }
                 catch (Exception)
                 {
