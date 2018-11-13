@@ -45,7 +45,7 @@ namespace WinService
 
         static Thread ThreadClient = null;//TCP线程
         static Socket SocketClient1 = null;//TCP客户端
-        static TcpListener tcpListener = null;//TCP文件客户端
+        static TcpClient tcpListener = null;//TCP文件客户端
 
 
 
@@ -74,24 +74,20 @@ namespace WinService
 
                 //定义一个套接字监听  
                 SocketClient1 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                tcpListener = new TcpListener(ip, port2);
+                tcpListener = new TcpClient();
 
                 try
-                {
-                    //客户端套接字连接到网络节点上，用的是Connect   
+                {                     
                     SocketClient1.Connect(ipe1);                    
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("连接失败！\r\n程序即将关闭");
-                   // Thread.Sleep(1000);
-                    //
+                    MessageBox.Show("连接失败！\r\n程序即将关闭");                
                     return -1;
                 }
                 try
-                {
-                    //客户端套接字连接到网络节点上，用的是Connect   
-                    tcpListener.Start();
+                {     
+                    tcpListener.Connect(ipe2);
                 }
                 catch (Exception)
                 {
@@ -124,137 +120,135 @@ namespace WinService
 
         public void SendFile(string filePath,string fileName)//上传文件方法
         {
-            
-            while (true)
-            {
-                try
-                {
-                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
-                    if (tcpClient.Connected)
-                    {
-                        NetworkStream stream = tcpClient.GetStream();
-                        //string fileName = "testfile.rar";
 
-                        byte[] fileNameByte = Encoding.Unicode.GetBytes(fileName);
-                        byte[] filePathByte = Encoding.Unicode.GetBytes(filePath);
 
-                        byte[] fileNameLengthForValueByte = Encoding.Unicode.GetBytes(fileNameByte.Length.ToString("D11"));
-                        byte[] filePathLengthForValueByte = Encoding.Unicode.GetBytes(filePathByte.Length.ToString("D11"));
-                        byte[] fileAttributeByte1 = new byte[fileNameByte.Length + fileNameLengthForValueByte.Length];
-                        byte[] fileAttributeByte2 = new byte[filePathByte.Length + filePathLengthForValueByte.Length];
-
-                        fileNameLengthForValueByte.CopyTo(fileAttributeByte1, 0);  //文件名字符流的长度的字符流排在前面。
-
-                        fileNameByte.CopyTo(fileAttributeByte1, fileNameLengthForValueByte.Length);  //紧接着文件名的字符流
-
-                        filePathLengthForValueByte.CopyTo(fileAttributeByte2, 0);  //文件目录字符流的长度的字符流排在前面。
-
-                        filePathByte.CopyTo(fileAttributeByte2, filePathLengthForValueByte.Length);  //紧接着文件目录的字符流
-
-                        stream.Write(fileAttributeByte1, 0, fileAttributeByte1.Length);
-
-                        stream.Write(fileAttributeByte2, 0, fileAttributeByte2.Length);//将文件头写入文件流
-
-                        FileStream fileStrem = new FileStream(filePath + "\\" + fileName, FileMode.Open);
-
-                        int fileReadSize = 0;
-                        long fileLength = 0;
-                        while (fileLength < fileStrem.Length)
-                        {
-                            byte[] buffer = new byte[2048];
-                            fileReadSize = fileStrem.Read(buffer, 0, buffer.Length);
-                            stream.Write(buffer, 0, fileReadSize);
-                            fileLength += fileReadSize;
-                        }
-                        fileStrem.Flush();
-                        stream.Flush();
-                        fileStrem.Close();
-                        stream.Close();
-
-                        Console.WriteLine(string.Format("{0}文件发送成功", fileName));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
-            }
-        }
-
-        private void ReceiveFileFunc(object obj)
-        {
-            IPEndPoint ipEndPoint = obj as IPEndPoint;
-            TcpClient tcpClient = new TcpClient();
             try
             {
-                tcpClient.Connect(ipEndPoint);
-            }
-            catch
-            {
-                Console.WriteLine("连接失败，找不到服务器！");
-            }
 
-            if (tcpClient.Connected)
-            {
-
-                NetworkStream stream = tcpClient.GetStream();
-                if (stream != null)
+                if (tcpListener.Connected)
                 {
+                    NetworkStream stream = tcpListener.GetStream();                    
 
-                    byte[] fileNameLengthForValueByte = Encoding.Unicode.GetBytes((256).ToString("D11"));
-                    byte[] fileNameLengByte = new byte[1024];
-                    byte[] filePathLengByte = new byte[1024];
-                    int fileNameLengthSize = stream.Read(fileNameLengByte, 0, fileNameLengthForValueByte.Length);
-                    string fileNameLength = Encoding.Unicode.GetString(fileNameLengByte, 0, fileNameLengthSize);
-                   
-                    Console.WriteLine("文件名字符流的长度为：" + fileNameLength);
+                    byte[] fileNameByte = Encoding.Unicode.GetBytes(fileName);
+                    byte[] filePathByte = Encoding.Unicode.GetBytes(filePath);
 
-                    int fileNameLengthNum = Convert.ToInt32(fileNameLength);
-                    byte[] fileNameByte = new byte[fileNameLengthNum];                    
+                    byte[] fileNameLengthForValueByte = Encoding.Unicode.GetBytes(fileNameByte.Length.ToString("D11"));
+                    byte[] filePathLengthForValueByte = Encoding.Unicode.GetBytes(filePathByte.Length.ToString("D11"));
+                    byte[] fileAttributeByte1 = new byte[fileNameByte.Length + fileNameLengthForValueByte.Length];
+                    byte[] fileAttributeByte2 = new byte[filePathByte.Length + filePathLengthForValueByte.Length];
 
-                    int fileNameSize = stream.Read(fileNameByte, 0, fileNameLengthNum);
-                    string fileName = Encoding.Unicode.GetString(fileNameByte, 0, fileNameSize);
-                    Console.WriteLine("文件名为：" + fileName);
+                    fileNameLengthForValueByte.CopyTo(fileAttributeByte1, 0);  //文件名字符流的长度的字符流排在前面。
 
-                    int filePathLengthSize = stream.Read(filePathLengByte, 0, fileNameLengthForValueByte.Length);
-                    string filePathLength = Encoding.Unicode.GetString(filePathLengByte, 0, filePathLengthSize);
+                    fileNameByte.CopyTo(fileAttributeByte1, fileNameLengthForValueByte.Length);  //紧接着文件名的字符流
 
-                    int filePathLengthNum = Convert.ToInt32(filePathLength);
-                    byte[] filePathByte = new byte[filePathLengthNum];
-                    Console.WriteLine("文件路径字符流的长度为：" + filePathLength);
+                    filePathLengthForValueByte.CopyTo(fileAttributeByte2, 0);  //文件目录字符流的长度的字符流排在前面。
 
-                    int filePathSize = stream.Read(filePathByte, 0, filePathLengthNum);
-                    string filePath = Encoding.Unicode.GetString(filePathByte, 0, filePathSize);
-                    Console.WriteLine("文件路径为：" + filePath);
+                    filePathByte.CopyTo(fileAttributeByte2, filePathLengthForValueByte.Length);  //紧接着文件目录的字符流
 
-                    string pathTemp = "";
-                    if(filePath.StartsWith("D:\\ctyunclass\\"))
-                    {
-                        pathTemp = filePath.Replace("D:\\ctyunclass\\", "D:\\FILES");
+                    stream.Write(fileAttributeByte1, 0, fileAttributeByte1.Length);
 
-                    }
-                    string dirPath = pathTemp;
-                    if (!Directory.Exists(dirPath))
-                    {
-                        Directory.CreateDirectory(dirPath);
-                    }
-                    FileStream fileStream = new FileStream(dirPath + "\\" + fileName, FileMode.Create, FileAccess.Write);
+                    stream.Write(fileAttributeByte2, 0, fileAttributeByte2.Length);//将文件头写入文件流
+
+                    FileStream fileStrem = new FileStream(filePath + "\\" + fileName, FileMode.Open);
+
                     int fileReadSize = 0;
-                    byte[] buffer = new byte[2048];
-                    while ((fileReadSize = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    long fileLength = 0;
+                    while (fileLength < fileStrem.Length)
                     {
-                        fileStream.Write(buffer, 0, fileReadSize);
-
+                        byte[] buffer = new byte[2048];
+                        fileReadSize = fileStrem.Read(buffer, 0, buffer.Length);
+                        stream.Write(buffer, 0, fileReadSize);
+                        fileLength += fileReadSize;
                     }
-                    fileStream.Flush();
-                    fileStream.Close();
+                    fileStrem.Flush();
                     stream.Flush();
+                    fileStrem.Close();
                     stream.Close();
-                    tcpClient.Close();
-                    Console.WriteLine("接收成功");
+
+                    Console.WriteLine(string.Format("{0}文件发送成功", fileName));
                 }
             }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
         }
+
+        //private void ReceiveFileFunc(object obj)
+        //{
+        //    IPEndPoint ipEndPoint = obj as IPEndPoint;
+        //    TcpClient tcpClient = new TcpClient();
+        //    try
+        //    {
+        //        tcpClient.Connect(ipEndPoint);
+        //    }
+        //    catch
+        //    {
+        //        Console.WriteLine("连接失败，找不到服务器！");
+        //    }
+
+        //    if (tcpClient.Connected)
+        //    {
+
+        //        NetworkStream stream = tcpClient.GetStream();
+        //        if (stream != null)
+        //        {
+
+        //            byte[] fileNameLengthForValueByte = Encoding.Unicode.GetBytes((256).ToString("D11"));
+        //            byte[] fileNameLengByte = new byte[1024];
+        //            byte[] filePathLengByte = new byte[1024];
+        //            int fileNameLengthSize = stream.Read(fileNameLengByte, 0, fileNameLengthForValueByte.Length);
+        //            string fileNameLength = Encoding.Unicode.GetString(fileNameLengByte, 0, fileNameLengthSize);
+                   
+        //            Console.WriteLine("文件名字符流的长度为：" + fileNameLength);
+
+        //            int fileNameLengthNum = Convert.ToInt32(fileNameLength);
+        //            byte[] fileNameByte = new byte[fileNameLengthNum];                    
+
+        //            int fileNameSize = stream.Read(fileNameByte, 0, fileNameLengthNum);
+        //            string fileName = Encoding.Unicode.GetString(fileNameByte, 0, fileNameSize);
+        //            Console.WriteLine("文件名为：" + fileName);
+
+        //            int filePathLengthSize = stream.Read(filePathLengByte, 0, fileNameLengthForValueByte.Length);
+        //            string filePathLength = Encoding.Unicode.GetString(filePathLengByte, 0, filePathLengthSize);
+
+        //            int filePathLengthNum = Convert.ToInt32(filePathLength);
+        //            byte[] filePathByte = new byte[filePathLengthNum];
+        //            Console.WriteLine("文件路径字符流的长度为：" + filePathLength);
+
+        //            int filePathSize = stream.Read(filePathByte, 0, filePathLengthNum);
+        //            string filePath = Encoding.Unicode.GetString(filePathByte, 0, filePathSize);
+        //            Console.WriteLine("文件路径为：" + filePath);
+
+        //            string pathTemp = "";
+        //            if(filePath.StartsWith("D:\\ctyunclass\\"))
+        //            {
+        //                pathTemp = filePath.Replace("D:\\ctyunclass\\", "D:\\FILES");
+
+        //            }
+        //            string dirPath = pathTemp;
+        //            if (!Directory.Exists(dirPath))
+        //            {
+        //                Directory.CreateDirectory(dirPath);
+        //            }
+        //            FileStream fileStream = new FileStream(dirPath + "\\" + fileName, FileMode.Create, FileAccess.Write);
+        //            int fileReadSize = 0;
+        //            byte[] buffer = new byte[2048];
+        //            while ((fileReadSize = stream.Read(buffer, 0, buffer.Length)) > 0)
+        //            {
+        //                fileStream.Write(buffer, 0, fileReadSize);
+
+        //            }
+        //            fileStream.Flush();
+        //            fileStream.Close();
+        //            stream.Flush();
+        //            stream.Close();
+        //            tcpClient.Close();
+        //            Console.WriteLine("接收成功");
+        //        }
+        //    }
+        //}
 
         public static void Recv()//接收信息
         {
