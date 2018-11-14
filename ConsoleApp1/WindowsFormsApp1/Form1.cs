@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -37,7 +38,7 @@ namespace WindowsFormsApp1
         static System.Drawing.Image bmp1 = null;
         static System.Drawing.Image bmp2 = null;
 
-
+        static string[] a1 = null;
 
         private void sendLogin()//广播教室号登陆
         {
@@ -263,7 +264,7 @@ namespace WindowsFormsApp1
         {
            if(-1!= startTCP())
             {
-                Thread.Sleep(500);
+                //Thread.Sleep(500);
                 string a = "select * from student;";
                 ClientSendMsg(a);
 
@@ -287,7 +288,7 @@ namespace WindowsFormsApp1
                 comboBox1.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 comboBox1.AutoCompleteSource = AutoCompleteSource.ListItems;
 
-                Thread.Sleep(500);
+                //Thread.Sleep(500);
 
                 comboBox2.Items.Clear();
                 newMsg = false;
@@ -627,46 +628,62 @@ namespace WindowsFormsApp1
         private void timer4_Tick(object sender, EventArgs e)
         {
             ClientSendMsg("ping");
-        }
-
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            toolStripButton2.Enabled = true;
-                webBrowser1.GoBack();
-            if (!webBrowser1.CanGoBack)
-            {
-                toolStripButton1.Enabled = false;
-            }
-        }
-
-        private void toolStripButton2_Click(object sender, EventArgs e)
-        {
-            toolStripButton1.Enabled = true;
-            webBrowser1.GoForward();
-            if (!webBrowser1.CanGoForward)
-            {
-                toolStripButton2.Enabled = false;
-            }
-        }
+        }         
 
         private void button5_Click(object sender, EventArgs e)
         {
-            timer5.Enabled = !timer5.Enabled;
-            if (timer5.Enabled)
+            treeView1.Nodes.Clear();
+            TreeNode rootNode = new TreeNode();    
+            rootNode.Text = textBox1.Text;
+            treeView1.Nodes.Add(rootNode);            
+            rootNode.Expand();
+
+            newMsg = false;
+            Console.WriteLine(newMsg.ToString());
+            int t = 0;
+            ClientSendMsg("sql- select class.name from choice,class where(choice.id_student='" + student_id + "' and choice.id_class=class.id);");
+            while (!newMsg && t < 100)
             {
-                groupBox5.BringToFront();             
-                webBrowser1.Refresh();
+                Thread.Sleep(50);
+                t++;
             }
-            else
+            if (t < 100)
             {
-                groupBox4.BringToFront();
+                a1 = message.Split('$');             
             }
-            Console.WriteLine(webBrowser1.DocumentText);
         }
 
-        private void timer5_Tick(object sender, EventArgs e)
+       
+
+        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            toolStripLabel2.Text = webBrowser1.Url.ToString().Replace("http://117.80.86.174:88/","");
+            treeView1.SelectedNode = e.Node;
+            
+            if (treeView1.SelectedNode.Nodes != null)
+            {
+                if (treeView1.SelectedNode.Parent == null)
+                {
+                    if (treeView1.SelectedNode.Nodes.Count == 0)
+                    {
+                        foreach (string s in a1)
+                        {
+                            if (s != "")
+                            {
+                                TreeNode leefNode = new TreeNode();
+                                leefNode.Text = s;
+                                leefNode.Tag = s + "\\";
+                                treeView1.SelectedNode.Nodes.Add(leefNode);
+                            }
+                        }
+                    }
+                }
+            }
+            treeView1.SelectedNode.Expand();
+        }
+
+        private void treeView1_AfterExpand(object sender, TreeViewEventArgs e)
+        {
+            
         }
     }
 }

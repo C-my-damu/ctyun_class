@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -347,6 +348,22 @@ namespace ConsoleApp2
                                     socketTemp.Value.Send(Encoding.UTF8.GetBytes(temp.Replace("flag_", "")));
                                 }
                             }                                                 
+                        }
+                        if (temp.StartsWith("path_"))//查询目录下的所有文件
+                        {
+                            string path = temp.Replace("path_", "");
+                            DirectoryInfo Dir = new DirectoryInfo(path);
+                            FileInfo[] files = Dir.GetFiles();
+                            if (ClientConnectionItems.Count > 0)
+                            {
+                                string msg = "";
+                                foreach(FileInfo info in Dir.GetFiles())
+                                {
+                                    msg += info.FullName.ToString() + "$";
+                                    
+                                }
+                                socketServer.Send(Encoding.UTF8.GetBytes(msg));
+                            }
                         }
                     }
                 }
