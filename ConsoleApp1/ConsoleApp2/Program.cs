@@ -136,7 +136,7 @@ namespace ConsoleApp2
                     //if (strSRecMsg != null&& strSRecMsg != "")
                     //{ 
                     string temp = strSRecMsg;
-                    if (temp == "room"||temp=="close" || temp == "")
+                    if (temp == "room"||temp=="close" || temp == ""||temp=="ping")
                     {
                         switch (temp)
                         {
@@ -158,6 +158,11 @@ namespace ConsoleApp2
                                     ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                                     Console.WriteLine("\r\n[客户端\"" + socketServer.RemoteEndPoint + "\"已经中断连接！ 客户端数量：" + ClientConnectionItems.Count + "]");
                                     f = false;
+                                    break;
+                                }
+                            case "ping"://处理心跳包保持连接
+                                {
+                                    Console.WriteLine("\r\n[客户端" + socketServer.RemoteEndPoint + "ping]");
                                     break;
                                 }
                         }         

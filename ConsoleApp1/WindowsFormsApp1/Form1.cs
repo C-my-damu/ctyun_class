@@ -34,7 +34,11 @@ namespace WindowsFormsApp1
         static string class_name = "";
         static string tempFile = "";
 
-        
+        static System.Drawing.Image bmp1 = null;
+        static System.Drawing.Image bmp2 = null;
+
+
+
         private void sendLogin()//广播教室号登陆
         {
             ClientSendMsg("LoginStudent_" + room_id.ToString());
@@ -54,6 +58,7 @@ namespace WindowsFormsApp1
                 {
                     //客户端套接字连接到网络节点上，用的是Connect  
                     SocketClient.Connect(ipe);
+                    timer4.Enabled = true;
                 }
                 catch (Exception)
                 {
@@ -155,6 +160,7 @@ namespace WindowsFormsApp1
                 }
                 catch (Exception ex)
                 {
+                    
                     Console.WriteLine("远程服务器已经中断连接！" + ex.Message + "\r\n");
                     break;
                 }
@@ -189,15 +195,14 @@ namespace WindowsFormsApp1
             if (File.Exists(localfile))
             {
 
-                writeStream = File.OpenWrite(localfile);             // 存在则打开要下载的文件
-                startPosition = writeStream.Length;                  // 获取已经下载的长度
-                writeStream.Seek(startPosition, SeekOrigin.Current); // 本地文件写入位置定位
+                File.Delete(localfile);            // 存在则删除要下载的文件
+               
             }
-            else
-            {
+            
+            
                 writeStream = new FileStream(localfile, FileMode.Create);// 文件不保存创建一个文件
                 startPosition = 0;
-            }
+            
 
 
             try
@@ -318,6 +323,7 @@ namespace WindowsFormsApp1
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)//退出程序释放资源
         {
+            timer4.Enabled = false;
             Thread.Sleep(500);
             if (ThreadClient!=null && ThreadClient.IsAlive)
                 ThreadClient.Abort();
@@ -331,6 +337,7 @@ namespace WindowsFormsApp1
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)//根据选择的学号加载姓名
         {
+            timer4.Enabled = true;
             textBox1.Text = "";
             newMsg = false;
             Console.WriteLine(newMsg.ToString());
@@ -351,6 +358,7 @@ namespace WindowsFormsApp1
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)//根据选择的教室加载课程
         {
+            timer4.Enabled = true;
             textBox2.Text = "";
             newMsg = false;
             Console.WriteLine(newMsg.ToString());
@@ -424,7 +432,7 @@ namespace WindowsFormsApp1
                     //Thread.Sleep(500);
                     t = 0;
                     newMsg = false;
-                    ClientSendMsg("sql- select name from classroom where(name='" + textBox2.Text + "') ");//获得当前课程id
+                    ClientSendMsg("sql- select id from classroom where(class_now='" + textBox2.Text + "') ");//获得当前课程id
                     while (!newMsg && t < 100)
                     {
                         Thread.Sleep(50);
@@ -470,12 +478,14 @@ namespace WindowsFormsApp1
             }
             else
                 MessageBox.Show("当前教室或课程未选择！");
+            timer4.Enabled = true;
             button4.Enabled = true;
             button1.Enabled = false;
         }
 
         private void button4_Click(object sender, EventArgs e)//退签按钮，并释放套接字
         {
+            timer4.Enabled = false;
             timer3.Enabled = false;
             ClientSendMsg("logout_" + room_id);
             Thread.Sleep(1000);
@@ -521,7 +531,7 @@ namespace WindowsFormsApp1
 
         private void timer3_Tick(object sender, EventArgs e)//刷新实时预览图
         {
-            if (flag_scr)
+            if (flash_scr)
             {
                 try
                 {
@@ -530,20 +540,35 @@ namespace WindowsFormsApp1
                     {
                         System.IO.Directory.CreateDirectory(subPath);
                     }
+                    try
+                    {
+                        File.Delete(subPath + "/src.jpg");
+                    }
+                    catch (Exception)
+                    {
 
-
-
+                    }
+                    if (pictureBox2.Image != null)
+                    {
+                        pictureBox2.Image.Dispose();
+                        pictureBox2.Image = null;                        
+                    }
+                    
                     if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/temp/src.jpg"), subPath + "/src.jpg"))
                     {
                         Thread.Sleep(1000);
-                        pictureBox2.Image = Image.FromFile(subPath + "/src.jpg");
+                        System.Drawing.Image img = System.Drawing.Image.FromFile(subPath + "/src.jpg");
+                        bmp1 = new System.Drawing.Bitmap(img);
+                        img.Dispose();
+                        pictureBox2.Image = bmp1;
+                        pictureBox2.BringToFront();
                     }
                         
                 }
-                catch (Exception)
+                catch (Exception ez)
                 {
-
-                    throw;
+                    Console.WriteLine(ez);
+                   // throw;
                 }
                 flash_scr = false;
             }
@@ -557,12 +582,28 @@ namespace WindowsFormsApp1
                         System.IO.Directory.CreateDirectory(subPath);
                     }
 
+                    try
+                    {
+                        File.Delete(subPath + "/pic.jpg");
+                    }
+                    catch (Exception)
+                    {
 
-
-                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/temp/src.jpg"), subPath + "/cam.jpg"))
+                    }
+                    if (pictureBox3.Image != null)
+                    {
+                        pictureBox3.Image.Dispose();
+                        pictureBox3.Image = null;                        
+                    }
+                    
+                    if (Download(Uri.EscapeUriString("http://117.80.86.174:88/" + class_name + "/temp/pic.jpg"), subPath + "/pic.jpg"))
                     {
                         Thread.Sleep(1000);
-                        pictureBox3.Image = Image.FromFile(subPath + "/cam.jpg");
+                        System.Drawing.Image img = System.Drawing.Image.FromFile(subPath + "/pic.jpg");
+                        bmp2 = new System.Drawing.Bitmap(img);
+                        img.Dispose();
+                        pictureBox3.Image = bmp2;
+                        pictureBox3.BringToFront();
                     }
                         
                 }
@@ -574,6 +615,11 @@ namespace WindowsFormsApp1
                 flash_cam = false;
             }
             
+        }
+
+        private void timer4_Tick(object sender, EventArgs e)
+        {
+            ClientSendMsg("ping");
         }
     }
 }

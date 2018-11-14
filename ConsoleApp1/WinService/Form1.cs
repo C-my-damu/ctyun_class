@@ -555,6 +555,7 @@ namespace WinService
                 }
                 b.Save(subPath +  "src.jpg");
                 SendFile(subPath,  "src.jpg");
+                sendFlash(1);
                 //startUpload(subPath + name + ".jpg", "http://117.80.86.174:88/" + class_name + "/src.jpg");
             }
             catch (Exception)
@@ -572,6 +573,7 @@ namespace WinService
             WindowState = t;
             //Clipboard.SetImage(b);
             this.Cursor = Cursors.Default;
+          
         }
 
         private void button2_Click(object sender, EventArgs e)//拍照按钮
@@ -591,6 +593,7 @@ namespace WinService
                     }
                     bb.Save(subPath  + "pic.jpg");
                     SendFile(subPath,  "pic.jpg");
+                    sendFlash(2);
                     pictureBox2.Visible = true;
                     pictureBox2.Image = b;
                    
@@ -616,6 +619,7 @@ namespace WinService
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)//程序结束释放资源
         {
+            timer3.Enabled = false;
             if (ThreadClient != null && ThreadClient.IsAlive)
             {
                 ThreadClient.Abort();
@@ -647,6 +651,7 @@ namespace WinService
                // Thread.Sleep(1000);
                 Application.Exit();
             }
+            timer3.Enabled = true;
             Thread.Sleep(100);
             comboBox2.Items.Clear();
             newMsg = false;
@@ -747,6 +752,7 @@ namespace WinService
             else
             MessageBox.Show("当前教室或课程未选择！");
             button4.Enabled = true;
+            button4.Enabled = true;
             button3.Enabled = false;
         }
 
@@ -767,6 +773,7 @@ namespace WinService
 
         private void button4_Click(object sender, EventArgs e)//下课按钮，清空签到人数，释放套接字
         {
+            timer3.Enabled = false;
             member = 0;
             
             if (ThreadClient.IsAlive)
@@ -790,6 +797,10 @@ namespace WinService
             comboBox2.Enabled = true;
             comboBox3.Enabled = true;
         }
-   
+
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+            ClientSendMsg("ping");
+        }
     }
 }

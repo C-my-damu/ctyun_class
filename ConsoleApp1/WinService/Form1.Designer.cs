@@ -49,6 +49,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.button4 = new System.Windows.Forms.Button();
+            this.timer3 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
@@ -82,7 +83,6 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(164, 29);
             this.comboBox2.TabIndex = 4;
-            
             // 
             // comboBox3
             // 
@@ -92,7 +92,6 @@
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(164, 29);
             this.comboBox3.TabIndex = 5;
-            
             // 
             // pictureBox1
             // 
@@ -211,6 +210,7 @@
             this.pictureBox2.Location = new System.Drawing.Point(287, 256);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(400, 225);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox2.TabIndex = 7;
             this.pictureBox2.TabStop = false;
             this.pictureBox2.Visible = false;
@@ -250,6 +250,11 @@
             this.button4.Text = "下课";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // timer3
+            // 
+            this.timer3.Interval = 10000;
+            this.timer3.Tick += new System.EventHandler(this.timer3_Tick);
             // 
             // Form1
             // 
@@ -307,6 +312,7 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Timer timer2;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Timer timer3;
     }
 }
 

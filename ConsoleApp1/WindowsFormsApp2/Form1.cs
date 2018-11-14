@@ -106,6 +106,17 @@ namespace WindowsFormsApp2
                             //stream.Dispose();
                             tcpClient.Close();
                             TxtReceiveAddContent("接收成功");
+                            
+                            string week = "第" + getWeek().ToString() + "周";
+                            string destpath = dirPath.Replace("temp", week+"\\"+fileName.Replace(".jpg",""));
+                            string copyname = fileName.Replace("pic", DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.ToShortTimeString().Replace(":", "-") + "-" + DateTime.Now.Second.ToString());
+                            copyname = fileName.Replace("src", DateTime.Now.Month.ToString()+"-"+DateTime.Now.Day.ToString() + "-" + DateTime.Now.ToShortTimeString().Replace(":", "-") + "-" + DateTime.Now.Second.ToString());
+                            if (!Directory.Exists(destpath))
+                            {
+                                Directory.CreateDirectory(destpath);
+                            }
+                            TxtReceiveAddContent("copy to :"+destpath  + copyname);
+                            File.Copy(dirPath + "\\" + fileName, destpath+copyname );
                         }
                     }
                     catch (Exception)
@@ -127,6 +138,26 @@ namespace WindowsFormsApp2
             
             }
             TxtReceiveAddContent(t.ToString() + "断开连接,进程结束");
+        }
+        private int getWeek()
+        {
+            int week = 0;
+            if (DateTime.Now.Month < 3)
+            {
+                week = (DateTime.Now.DayOfYear + 122) / 7;
+            }
+            else
+            {
+                if (DateTime.Now.Month<9)
+                {
+                    week = (DateTime.Now.DayOfYear - 59) / 7;               
+                }
+                else
+                {
+                    week = (DateTime.Now.DayOfYear - 243) / 7;    
+                }
+            }
+            return week;
         }
         private void ReceiveFileFunc()//接受请求并启动接收文件线程
         {
