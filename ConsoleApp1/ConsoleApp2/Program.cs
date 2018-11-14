@@ -121,14 +121,15 @@ namespace ConsoleApp2
             {
                 //创建一个内存缓冲区，其大小为1024*1024字节  即1M     
                 byte[] arrServerRecMsg = new byte[1024 * 1024];
-                //将接收到的信息存入到内存缓冲区，并返回其字节数组的长度    
+                //将接收到的信息存入到内存缓冲区，并返回其字节数组的长度   
+                MySqlCommand mycmd = localSql.CreateCommand();
                 try
                 {
                     int length = socketServer.Receive(arrServerRecMsg);
 
                     //将机器接受到的字节数组转换为人可以读懂的字符串     
                     string strSRecMsg = Encoding.UTF8.GetString(arrServerRecMsg, 0, length);
-                    MySqlCommand mycmd = localSql.CreateCommand();
+                    //MySqlCommand mycmd = localSql.CreateCommand();
                     Console.WriteLine(":"+strSRecMsg);
                     //  MySqlDataAdapter adap = new MySqlDataAdapter(mycmd);
                     // DataSet ds = new DataSet();
@@ -146,18 +147,26 @@ namespace ConsoleApp2
                                 }
                             case "close":
                                 {
+                                    string sql = string.Format("update classroom set class_now = '无课程' where (ip = '" + socketServer.RemoteEndPoint.ToString() + "')");
+                                    mycmd.CommandText = sql;
+                                    mycmd.CommandType = CommandType.Text;
                                     socketServer.Shutdown(SocketShutdown.Both);
                                     ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                                     Console.WriteLine("\r\n[客户端\"" + socketServer.RemoteEndPoint + "\"已经中断连接！ 客户端数量：" + ClientConnectionItems.Count + "]");
                                     f = false;
+                                    mycmd.Dispose();
                                     break;
                                 }
                             case "":
                                 {
+                                    string sql = string.Format("update classroom set class_now = '无课程' where (ip = '" + socketServer.RemoteEndPoint.ToString() + "')");
+                                    mycmd.CommandText = sql;
+                                    mycmd.CommandType = CommandType.Text;
                                     socketServer.Shutdown(SocketShutdown.Both);
                                     ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                                     Console.WriteLine("\r\n[客户端\"" + socketServer.RemoteEndPoint + "\"已经中断连接！ 客户端数量：" + ClientConnectionItems.Count + "]");
                                     f = false;
+                                    mycmd.Dispose();
                                     break;
                                 }
                             case "ping"://处理心跳包保持连接
@@ -337,6 +346,11 @@ namespace ConsoleApp2
                 }
                 catch (Exception e)
                 {
+                    string sql = string.Format("update classroom set class_now = '无课程' where (ip = '" + socketServer.RemoteEndPoint.ToString() + "')");
+                    mycmd.CommandText = sql;
+                    mycmd.CommandType = CommandType.Text;
+                    socketServer.Shutdown(SocketShutdown.Both);
+                    ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                     Console.WriteLine(e.ToString());
                     ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                     //提示套接字监听异常  
