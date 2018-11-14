@@ -337,22 +337,39 @@ namespace WindowsFormsApp1
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)//根据选择的学号加载姓名
         {
-            timer4.Enabled = true;
-            textBox1.Text = "";
-            newMsg = false;
-            Console.WriteLine(newMsg.ToString());
-            int t = 0;            
-            ClientSendMsg("sql- select name from student where(classnumber='" + comboBox1.SelectedItem.ToString() + "');");
-            while (!newMsg && t < 100)
+            if (comboBox1.SelectedItem.ToString() != "")
             {
-                Thread.Sleep(50);
-                t++;
-            }
-            if (t < 100)
-            {
-                string[] a = message.Split('$');
-                textBox1.Text = (a[0]);
+                timer4.Enabled = true;
+                textBox1.Text = "";
+                newMsg = false;
+                Console.WriteLine(newMsg.ToString());
+                int t = 0;
+                ClientSendMsg("sql- select name from student where(classnumber='" + comboBox1.SelectedItem.ToString() + "');");
+                while (!newMsg && t < 100)
+                {
+                    Thread.Sleep(50);
+                    t++;
+                }
+                if (t < 100)
+                {
+                    string[] a = message.Split('$');
+                    textBox1.Text = (a[0]);
 
+                }
+                newMsg = false;
+                t = 0;
+                ClientSendMsg("sql- select id from student where(classnumber='" + comboBox1.SelectedItem.ToString() + "') ");//获得当前学生id
+                while (!newMsg && t < 100)
+                {
+                    Thread.Sleep(50);
+                    t++;
+                }
+                if (t < 100)
+                {
+                    student_id = message.Split('$')[0];
+                    Console.WriteLine("student_id:" + student_id + "\n\r");
+                }
+                button5.Enabled = true;
             }
         }
 
@@ -402,21 +419,9 @@ namespace WindowsFormsApp1
                     if (System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.Length > 1)
                         tempIP = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList[1].ToString();
                     ClientSendMsg("sql- UPDATE `student` SET `ip` =  '!tempIP!'where(name='" + textBox1.Text + "') ");//注册学生端当前IP
-                    newMsg = false;
-                    int t = 0;
-                    ClientSendMsg("sql- select id from student where(classnumber='" + comboBox1.SelectedItem.ToString() + "') ");//获得当前学生id
-                    while (!newMsg && t < 100)
-                    {
-                        Thread.Sleep(50);
-                        t++;
-                    }
-                    if (t < 100)
-                    {
-                        student_id = message.Split('$')[0];
-                        Console.WriteLine("student_id:" + student_id + "\n\r");
-                    }
+                   
                     //Thread.Sleep(500);
-                    t = 0;
+                    int t = 0;
                     newMsg = false;
                     ClientSendMsg("sql- select id from classroom where(name='" + comboBox2.SelectedItem.ToString() + "') ");//获得当前教室id
                     while (!newMsg && t < 100)
@@ -622,6 +627,46 @@ namespace WindowsFormsApp1
         private void timer4_Tick(object sender, EventArgs e)
         {
             ClientSendMsg("ping");
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            toolStripButton2.Enabled = true;
+                webBrowser1.GoBack();
+            if (!webBrowser1.CanGoBack)
+            {
+                toolStripButton1.Enabled = false;
+            }
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            toolStripButton1.Enabled = true;
+            webBrowser1.GoForward();
+            if (!webBrowser1.CanGoForward)
+            {
+                toolStripButton2.Enabled = false;
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            timer5.Enabled = !timer5.Enabled;
+            if (timer5.Enabled)
+            {
+                groupBox5.BringToFront();             
+                webBrowser1.Refresh();
+            }
+            else
+            {
+                groupBox4.BringToFront();
+            }
+            Console.WriteLine(webBrowser1.DocumentText);
+        }
+
+        private void timer5_Tick(object sender, EventArgs e)
+        {
+            toolStripLabel2.Text = webBrowser1.Url.ToString().Replace("http://117.80.86.174:88/","");
         }
     }
 }

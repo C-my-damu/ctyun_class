@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -51,17 +52,19 @@
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.button6 = new System.Windows.Forms.Button();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.treeView1 = new System.Windows.Forms.TreeView();
             this.label4 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.timer3 = new System.Windows.Forms.Timer(this.components);
             this.timer4 = new System.Windows.Forms.Timer(this.components);
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
+            this.timer5 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -69,7 +72,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.groupBox5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -245,6 +248,7 @@
             this.button5.TabIndex = 10;
             this.button5.Text = "查看文件";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // groupBox4
             // 
@@ -299,75 +303,15 @@
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.button6);
-            this.groupBox5.Controls.Add(this.label8);
-            this.groupBox5.Controls.Add(this.label7);
-            this.groupBox5.Controls.Add(this.label6);
-            this.groupBox5.Controls.Add(this.pictureBox1);
-            this.groupBox5.Controls.Add(this.treeView1);
+            this.groupBox5.Controls.Add(this.webBrowser1);
+            this.groupBox5.Controls.Add(this.toolStrip1);
             this.groupBox5.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox5.Location = new System.Drawing.Point(270, 96);
+            this.groupBox5.Location = new System.Drawing.Point(270, 72);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(1054, 526);
+            this.groupBox5.Size = new System.Drawing.Size(1054, 550);
             this.groupBox5.TabIndex = 11;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "文件浏览";
-            // 
-            // button6
-            // 
-            this.button6.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button6.Location = new System.Drawing.Point(782, 444);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(189, 43);
-            this.button6.TabIndex = 11;
-            this.button6.Text = "查看文件";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
-            // label8
-            // 
-            this.label8.AutoEllipsis = true;
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(719, 354);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(46, 27);
-            this.label8.TabIndex = 4;
-            this.label8.Text = "null";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.Location = new System.Drawing.Point(719, 318);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(92, 27);
-            this.label7.TabIndex = 3;
-            this.label7.Text = "当前目录";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(719, 37);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(92, 27);
-            this.label6.TabIndex = 2;
-            this.label6.Text = "文件预览";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(724, 77);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(318, 208);
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // treeView1
-            // 
-            this.treeView1.Location = new System.Drawing.Point(23, 37);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(681, 476);
-            this.treeView1.TabIndex = 0;
             // 
             // label4
             // 
@@ -401,6 +345,81 @@
             this.timer4.Interval = 10000;
             this.timer4.Tick += new System.EventHandler(this.timer4_Tick);
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripButton1,
+            this.toolStripButton2,
+            this.toolStripButton3,
+            this.toolStripLabel1,
+            this.toolStripLabel2});
+            this.toolStrip1.Location = new System.Drawing.Point(3, 30);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(1048, 28);
+            this.toolStrip1.TabIndex = 1;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(46, 25);
+            this.toolStripButton1.Text = "后退";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            // 
+            // toolStripButton2
+            // 
+            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton2.Enabled = false;
+            this.toolStripButton2.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
+            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Size = new System.Drawing.Size(46, 25);
+            this.toolStripButton2.Text = "前进";
+            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+            // 
+            // toolStripButton3
+            // 
+            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton3.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
+            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton3.Name = "toolStripButton3";
+            this.toolStripButton3.Size = new System.Drawing.Size(190, 25);
+            this.toolStripButton3.Text = "下载当前文件（文件夹）";
+            // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.Font = new System.Drawing.Font("Microsoft YaHei UI Light", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(128, 25);
+            this.toolStripLabel1.Text = "当前文件/文件夹";
+            // 
+            // toolStripLabel2
+            // 
+            this.toolStripLabel2.Font = new System.Drawing.Font("Microsoft YaHei UI Light", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.toolStripLabel2.Name = "toolStripLabel2";
+            this.toolStripLabel2.Size = new System.Drawing.Size(0, 25);
+            // 
+            // webBrowser1
+            // 
+            this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser1.Location = new System.Drawing.Point(3, 58);
+            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser1.Name = "webBrowser1";
+            this.webBrowser1.Size = new System.Drawing.Size(1048, 489);
+            this.webBrowser1.TabIndex = 2;
+            this.webBrowser1.Url = new System.Uri("http://117.80.86.174:88", System.UriKind.Absolute);
+            // 
+            // timer5
+            // 
+            this.timer5.Interval = 500;
+            this.timer5.Tick += new System.EventHandler(this.timer5_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -427,7 +446,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -456,18 +476,20 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Timer timer2;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.TreeView treeView1;
-        private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Timer timer3;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.Timer timer4;
+        private System.Windows.Forms.WebBrowser webBrowser1;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.Timer timer5;
     }
 }
 
