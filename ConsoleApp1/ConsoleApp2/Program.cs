@@ -147,25 +147,31 @@ namespace ConsoleApp2
                                 }
                             case "close":
                                 {
-                                    string sql = string.Format("update classroom set class_now = '无课程' where (ip = '" + socketServer.RemoteEndPoint.ToString() + "')");
+                                    string sql = string.Format("update `classroom` set `class_now` = '无课程' where (`ip` =  '" + socketServer.RemoteEndPoint.ToString() + "')");
                                     mycmd.CommandText = sql;
+                                    Console.WriteLine(sql);
                                     mycmd.CommandType = CommandType.Text;
+                                    MySqlDataReader sdr = mycmd.ExecuteReader();
                                     socketServer.Shutdown(SocketShutdown.Both);
                                     ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                                     Console.WriteLine("\r\n[客户端\"" + socketServer.RemoteEndPoint + "\"已经中断连接！ 客户端数量：" + ClientConnectionItems.Count + "]");
                                     f = false;
+                                    mycmd.Cancel();
                                     mycmd.Dispose();
                                     break;
                                 }
                             case "":
                                 {
-                                    string sql = string.Format("update classroom set class_now = '无课程' where (ip = '" + socketServer.RemoteEndPoint.ToString() + "')");
+                                    string sql = string.Format("update `classroom` set `class_now` = '无课程' where (`ip` = '" + socketServer.RemoteEndPoint.ToString() + "')");
                                     mycmd.CommandText = sql;
+                                    Console.WriteLine(sql);
                                     mycmd.CommandType = CommandType.Text;
+                                    MySqlDataReader sdr = mycmd.ExecuteReader();
                                     socketServer.Shutdown(SocketShutdown.Both);
                                     ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                                     Console.WriteLine("\r\n[客户端\"" + socketServer.RemoteEndPoint + "\"已经中断连接！ 客户端数量：" + ClientConnectionItems.Count + "]");
                                     f = false;
+                                    mycmd.Cancel();
                                     mycmd.Dispose();
                                     break;
                                 }
@@ -346,9 +352,13 @@ namespace ConsoleApp2
                 }
                 catch (Exception e)
                 {
-                    string sql = string.Format("update classroom set class_now = '无课程' where (ip = '" + socketServer.RemoteEndPoint.ToString() + "')");
+                    string sql = string.Format("update `classroom` set `class_now` = '无课程' where (`ip` = '" + socketServer.RemoteEndPoint.ToString() + "')");
+                    Console.WriteLine(sql);
                     mycmd.CommandText = sql;
                     mycmd.CommandType = CommandType.Text;
+                    MySqlDataReader sdr = mycmd.ExecuteReader();
+                    mycmd.Cancel();
+                    mycmd.Dispose();
                     socketServer.Shutdown(SocketShutdown.Both);
                     ClientConnectionItems.Remove(socketServer.RemoteEndPoint.ToString());
                     Console.WriteLine(e.ToString());

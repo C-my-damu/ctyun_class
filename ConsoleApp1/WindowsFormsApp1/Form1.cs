@@ -19,8 +19,8 @@ namespace WindowsFormsApp1
         static Thread ThreadClient = null;
         static Socket SocketClient = null;
 
-        static bool flag_scr = true;
-        static bool flag_cam = true;
+        static bool flag_scr = false;
+        static bool flag_cam = false;
         static bool flash_scr = false;
         static bool flash_cam = false;
 
@@ -32,7 +32,7 @@ namespace WindowsFormsApp1
         static string student_id = "";
         static string class_id = "";
         static string class_name = "";
-        static string tempFile = "";
+       
 
         static System.Drawing.Image bmp1 = null;
         static System.Drawing.Image bmp2 = null;
@@ -393,7 +393,7 @@ namespace WindowsFormsApp1
                     MessageBox.Show("连接服务器成功！");
                 }
             }
-            if (comboBox1.SelectedIndex.ToString() != "" && comboBox2.SelectedItem.ToString() != "")
+            if (comboBox1.SelectedIndex.ToString() != "" && comboBox2.SelectedItem.ToString() != "" && textBox2.Text != "无课程")
             {
                 DialogResult dr = MessageBox.Show("学号：" + comboBox1.SelectedItem.ToString()+"  姓名："+textBox1.Text + "\n\r教室：" + comboBox2.SelectedItem.ToString()+"  课程："+textBox2.Text + "\n\r是否确认？", "取消", MessageBoxButtons.OKCancel);
                 if (dr == DialogResult.OK)
@@ -468,6 +468,10 @@ namespace WindowsFormsApp1
                     timer3.Enabled = true;
                     comboBox1.Enabled = false;
                     comboBox2.Enabled = false;
+
+                    timer4.Enabled = true;
+                    button4.Enabled = true;
+                    button1.Enabled = false;
                 }
                 else
                 {
@@ -477,10 +481,8 @@ namespace WindowsFormsApp1
 
             }
             else
-                MessageBox.Show("当前教室或课程未选择！");
-            timer4.Enabled = true;
-            button4.Enabled = true;
-            button1.Enabled = false;
+                MessageBox.Show("当前教室或课程未选择\n\r或当前教室无课程！");
+            
         }
 
         private void button4_Click(object sender, EventArgs e)//退签按钮，并释放套接字
