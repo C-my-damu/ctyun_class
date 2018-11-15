@@ -37,6 +37,7 @@ namespace WindowsFormsApp1
 
         static System.Drawing.Image bmp1 = null;
         static System.Drawing.Image bmp2 = null;
+        static System.Drawing.Image bmp3 = null;
 
         static string[] a1 = null;
 
@@ -529,6 +530,14 @@ namespace WindowsFormsApp1
         {
             button2.Enabled = flag_scr;
             button3.Enabled = flag_cam;
+            if (textBox1.Text != "" && textBox2.Text !="")
+            {
+                button1.Enabled = true;
+            }
+            else
+            {
+                button1.Enabled = false;
+            }
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -625,43 +634,59 @@ namespace WindowsFormsApp1
             
         }
 
-        private void timer4_Tick(object sender, EventArgs e)
+        private void timer4_Tick(object sender, EventArgs e)//发送心跳包保持连接
         {
             ClientSendMsg("ping");
         }         
 
-        private void button5_Click(object sender, EventArgs e)
+        private void button5_Click(object sender, EventArgs e)//开启文件浏览，获取当前用户可访问的课程
         {
-            treeView1.Nodes.Clear();
-            TreeNode rootNode = new TreeNode();    
-            rootNode.Text = textBox1.Text;
-            treeView1.Nodes.Add(rootNode);            
-            rootNode.Expand();
+            if (button5.Text == "查看文件")
+            {
+                groupBox5.BringToFront();
+                treeView1.Nodes.Clear();
+                TreeNode rootNode = new TreeNode();
+                rootNode.Text = textBox1.Text;
+                rootNode.Tag = textBox1.Text + "\\";
+                treeView1.Nodes.Add(rootNode);
+                rootNode.Expand();
 
-            newMsg = false;
-            Console.WriteLine(newMsg.ToString());
-            int t = 0;
-            ClientSendMsg("sql- select class.name from choice,class where(choice.id_student='" + student_id + "' and choice.id_class=class.id);");
-            while (!newMsg && t < 100)
-            {
-                Thread.Sleep(50);
-                t++;
+                newMsg = false;
+                Console.WriteLine(newMsg.ToString());
+                int t = 0;
+                ClientSendMsg("sql- select class.name from choice,class where(choice.id_student='" + student_id + "' and choice.id_class=class.id);");
+                while (!newMsg && t < 100)
+                {
+                    Thread.Sleep(50);
+                    t++;
+                }
+                if (t < 100)
+                {
+                    a1 = message.Split('$');
+                }
+                button5.Text = "结束查看";
             }
-            if (t < 100)
+            else
             {
-                a1 = message.Split('$');             
+                pictureBox3.Image = null;
+                pictureBox3.Image.Dispose();
+                label6.Text = "请选择文件/文件夹";
+                groupBox4.BringToFront();
+                button5.Text = "查看文件";
             }
+            
         }
 
        
 
-        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)//首次单机添加节点
         {
             treeView1.SelectedNode = e.Node;
-            
+            label6.Text = (string) treeView1.SelectedNode.Tag;
+            button6.Text = "下载当前目录下的全部文件";
             if (treeView1.SelectedNode.Nodes != null)
             {
-                if (treeView1.SelectedNode.Parent == null)
+                if (treeView1.SelectedNode.Parent == null)//无父节点，为根节点
                 {
                     if (treeView1.SelectedNode.Nodes.Count == 0)
                     {
@@ -671,12 +696,72 @@ namespace WindowsFormsApp1
                             {
                                 TreeNode leefNode = new TreeNode();
                                 leefNode.Text = s;
-                                leefNode.Tag = s + "\\";
+                                leefNode.Tag = treeView1.SelectedNode.Tag.ToString()+ s + "\\";
                                 treeView1.SelectedNode.Nodes.Add(leefNode);
                             }
                         }
                     }
                 }
+                else//非根节点
+                {
+                    if (treeView1.SelectedNode.Tag.ToString().Contains("."))//该节点为文件叶子节点
+                    {
+                        button6.Text = "下载当前文件";
+                        Console.WriteLine(((string)treeView1.SelectedNode.Tag).Replace(textBox1.Text, "http://117.80.86.174:88").Replace("\\", "/"));
+                        string url = Uri.EscapeUriString(((string)treeView1.SelectedNode.Tag).Replace(textBox1.Text , "http://117.80.86.174:88").Replace("\\","/"));
+                        Console.WriteLine("url:"+url);
+                        string local = "D:\\ctyunclass\\temp\\preview.jpg";
+                        if(Download(url, local))
+                        {
+                            Thread.Sleep(1000);
+                            System.Drawing.Image img = System.Drawing.Image.FromFile(local);
+                            bmp3 = new System.Drawing.Bitmap(img);
+                            img.Dispose();
+                            pictureBox1.Image = bmp3;
+                            pictureBox1.BringToFront();
+                        }
+                    }
+                    else
+                    {
+                        if(treeView1.SelectedNode.Nodes.Count==0)//非文件叶子节点，即为未展开的中间目录
+                        {
+                            int t = 0;
+                            newMsg = false;
+                            ClientSendMsg("path_D:\\FILES\\"+treeView1.SelectedNode.Tag.ToString().Replace(textBox1.Text+"\\","") );
+                            string[] at = null;
+                            while (!newMsg && t < 100)
+                            {
+                                Thread.Sleep(50);
+                                t++;
+                            }
+                            if (t < 100)
+                            {
+                                at = message.Split('$');
+
+                                foreach (string s in at)
+                                {
+                                    if (s != ""&&s!="temp")
+                                    {
+                                        TreeNode leefNode = new TreeNode();
+                                        leefNode.Text = s;
+                                        if (s.Contains("."))//是文件
+                                        {
+                                            leefNode.Tag = treeView1.SelectedNode.Tag.ToString() + s;
+                                        }
+                                        else//是文件夹
+                                        {
+                                            leefNode.Tag = treeView1.SelectedNode.Tag.ToString() + s + "\\";
+                                        }                                        
+                                        treeView1.SelectedNode.Nodes.Add(leefNode);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+
             }
             treeView1.SelectedNode.Expand();
         }

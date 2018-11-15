@@ -352,18 +352,21 @@ namespace ConsoleApp2
                         if (temp.StartsWith("path_"))//查询目录下的所有文件
                         {
                             string path = temp.Replace("path_", "");
+                            Console.WriteLine(path);
                             DirectoryInfo Dir = new DirectoryInfo(path);
-                            FileInfo[] files = Dir.GetFiles();
+                            FileSystemInfo[] files = Dir.GetFileSystemInfos();
                             if (ClientConnectionItems.Count > 0)
                             {
                                 string msg = "";
-                                foreach(FileInfo info in Dir.GetFiles())
+                                foreach(FileSystemInfo info in files)
                                 {
-                                    msg += info.FullName.ToString() + "$";
+                                    msg += info.Name + "$";
+                                    Console.WriteLine(info.Name);
                                     
                                 }
                                 socketServer.Send(Encoding.UTF8.GetBytes(msg));
                             }
+                            
                         }
                     }
                 }
