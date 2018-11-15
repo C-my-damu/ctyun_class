@@ -530,7 +530,7 @@ namespace WindowsFormsApp1
         {
             button2.Enabled = flag_scr;
             button3.Enabled = flag_cam;
-            if (textBox1.Text != "" && textBox2.Text !="")
+            if (textBox1.Text != "" && textBox2.Text !=""&&!button4.Enabled)
             {
                 button1.Enabled = true;
             }
