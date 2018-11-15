@@ -558,11 +558,14 @@ namespace WinService
                 sendFlash(1);
                 //startUpload(subPath + name + ".jpg", "http://117.80.86.174:88/" + class_name + "/src.jpg");
             }
-            catch (Exception)
+            catch (Exception e0)
             {
                 WindowState = t;
-                MessageBox.Show("截屏保存失败，请确认软件权限或关闭截图功能");
-                throw;
+                button6.PerformClick();
+                MessageBox.Show(e0.ToString()+"\n\r截屏保存失败，请确认软件权限或关闭截图功能");
+               
+                
+                //throw;
             }
             if (pictureBox1.Image != null)
             {
@@ -608,10 +611,13 @@ namespace WinService
                     pictureBox2.Visible = false;
                     
                 }
-                catch (Exception)
+                catch (Exception e1)
                 {
-                    MessageBox.Show("截屏保存失败，请确认软件权限或关闭拍照功能");
-                    throw;
+                    button5.PerformClick();
+                    MessageBox.Show(e1.ToString()+"\n\r照片保存失败，请确认软件权限或关闭拍照功能");
+                    
+                   
+                    //throw;
                 }
             }
             

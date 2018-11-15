@@ -51,17 +51,17 @@
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.button6 = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.label4 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.timer3 = new System.Windows.Forms.Timer(this.components);
             this.timer4 = new System.Windows.Forms.Timer(this.components);
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.button6 = new System.Windows.Forms.Button();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -316,6 +316,54 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "文件浏览";
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Enabled = false;
+            this.progressBar1.Location = new System.Drawing.Point(498, 517);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(541, 24);
+            this.progressBar1.TabIndex = 5;
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(638, 456);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(272, 42);
+            this.button6.TabIndex = 4;
+            this.button6.Text = "下载当前目录下的全部文件";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click_1);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.Location = new System.Drawing.Point(466, 411);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(112, 27);
+            this.label7.TabIndex = 3;
+            this.label7.Text = "当前选择：";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(584, 411);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(181, 27);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "请选择文件/文件夹";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pictureBox1.Location = new System.Drawing.Point(466, 37);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(640, 360);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
+            // 
             // treeView1
             // 
             this.treeView1.Location = new System.Drawing.Point(14, 37);
@@ -356,54 +404,6 @@
             this.timer4.Interval = 10000;
             this.timer4.Tick += new System.EventHandler(this.timer4_Tick);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox1.Location = new System.Drawing.Point(466, 37);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(640, 360);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(584, 411);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(181, 27);
-            this.label6.TabIndex = 2;
-            this.label6.Text = "请选择文件/文件夹";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.Location = new System.Drawing.Point(466, 411);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(112, 27);
-            this.label7.TabIndex = 3;
-            this.label7.Text = "当前选择：";
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(638, 456);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(272, 42);
-            this.button6.TabIndex = 4;
-            this.button6.Text = "下载当前目录下的全部文件";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click_1);
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Enabled = false;
-            this.progressBar1.Location = new System.Drawing.Point(498, 517);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(541, 24);
-            this.progressBar1.TabIndex = 5;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -413,8 +413,8 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
+            this.Controls.Add(this.groupBox5);
             this.Name = "Form1";
             this.Text = "天翼云智慧课堂学生端";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);

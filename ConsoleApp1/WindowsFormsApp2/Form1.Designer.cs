@@ -36,17 +36,17 @@
             this.txtReceive.Location = new System.Drawing.Point(12, 12);
             this.txtReceive.Multiline = true;
             this.txtReceive.Name = "txtReceive";
-            this.txtReceive.Size = new System.Drawing.Size(294, 282);
+            this.txtReceive.Size = new System.Drawing.Size(836, 301);
             this.txtReceive.TabIndex = 0;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(318, 306);
+            this.ClientSize = new System.Drawing.Size(860, 325);
             this.Controls.Add(this.txtReceive);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "天翼云文件接受服务器";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.ResumeLayout(false);
