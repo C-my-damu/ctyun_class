@@ -19,6 +19,7 @@ namespace ConsoleApp2
         //定义一个集合，存储客户端信息
         static Dictionary<string, Socket> ClientConnectionItems = new Dictionary<string, Socket> { };
         static MySqlConnection localSql = new MySqlConnection("Database=ctyun_class;Data Source=127.0.0.1;User Id=pc-test;Password=damu19950313_");
+        static string msgfile="";
         static void Main(string[] args)
         {
             //MySqlConnection localSql = null;
@@ -65,6 +66,27 @@ namespace ConsoleApp2
             SocketWatch.Close();
             localSql.Close();
         }
+
+        static void Director(string dir)
+        {
+            
+            DirectoryInfo d = new DirectoryInfo(dir);
+            FileSystemInfo[] fsinfos = d.GetFileSystemInfos();
+            foreach (FileSystemInfo fsinfo in fsinfos)
+            {
+                if (fsinfo is DirectoryInfo)     //判断是否为文件夹
+                {
+                    Director(fsinfo.FullName);//递归调用
+                }
+                else
+                {
+                    msgfile += fsinfo.FullName + "$";
+                    Console.WriteLine(msgfile);//输出文件的全部路径
+                }
+            }
+            //return re;
+        }
+
         static void WatchConnecting()
         {
             Socket connection = null;
@@ -361,12 +383,27 @@ namespace ConsoleApp2
                                 foreach(FileSystemInfo info in files)
                                 {
                                     msg += info.Name + "$";
-                                    Console.WriteLine(info.Name);
-                                    
+                                    //Console.WriteLine(info.Name);                                    
                                 }
+                                //Console.WriteLine("all files:"+msg);
                                 socketServer.Send(Encoding.UTF8.GetBytes(msg));
                             }
                             
+                        }
+                        if (temp.StartsWith("pall_"))//查询目录下的所有文件
+                        {
+                            string path = temp.Replace("pall_", "");
+                            Console.WriteLine(path);
+                            
+                            if (ClientConnectionItems.Count > 0)
+                            {
+                                //string msgfile = "";
+                                Director(path);
+                                Console.WriteLine("all:"+msgfile);                                
+                                socketServer.Send(Encoding.UTF8.GetBytes(msgfile));
+                                msgfile = "";
+                            }
+
                         }
                     }
                 }

@@ -322,7 +322,6 @@
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(446, 504);
             this.treeView1.TabIndex = 0;
-            this.treeView1.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterExpand);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseClick);
             // 
             // label4
@@ -395,6 +394,7 @@
             this.button6.TabIndex = 4;
             this.button6.Text = "下载当前目录下的全部文件";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click_1);
             // 
             // progressBar1
             // 

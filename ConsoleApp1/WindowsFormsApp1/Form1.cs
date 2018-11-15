@@ -52,7 +52,7 @@ namespace WindowsFormsApp1
             {
                 int port = 5500;
                 string host = "117.80.86.174";//服务器端ip地址
-                string host2 = "127.0.0.1";//本地调试用ip
+                //string host2 = "127.0.0.1";//本地调试用ip
                 IPAddress ip = IPAddress.Parse(host);
                 IPEndPoint ipe = new IPEndPoint(ip, port);
                 SocketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -668,8 +668,12 @@ namespace WindowsFormsApp1
             }
             else
             {
-                pictureBox3.Image = null;
-                pictureBox3.Image.Dispose();
+                if (pictureBox1.Image != null)
+                {
+                    pictureBox1.Image.Dispose();
+                    pictureBox1.Image = null;
+                }               
+               
                 label6.Text = "请选择文件/文件夹";
                 groupBox4.BringToFront();
                 button5.Text = "查看文件";
@@ -707,6 +711,11 @@ namespace WindowsFormsApp1
                     if (treeView1.SelectedNode.Tag.ToString().Contains("."))//该节点为文件叶子节点
                     {
                         button6.Text = "下载当前文件";
+                        string subPath = "D:\\ctyunclass\\temp";
+                        if (false == System.IO.Directory.Exists(subPath))
+                        {
+                            System.IO.Directory.CreateDirectory(subPath);
+                        }
                         Console.WriteLine(((string)treeView1.SelectedNode.Tag).Replace(textBox1.Text, "http://117.80.86.174:88").Replace("\\", "/"));
                         string url = Uri.EscapeUriString(((string)treeView1.SelectedNode.Tag).Replace(textBox1.Text , "http://117.80.86.174:88").Replace("\\","/"));
                         Console.WriteLine("url:"+url);
@@ -766,9 +775,69 @@ namespace WindowsFormsApp1
             treeView1.SelectedNode.Expand();
         }
 
-        private void treeView1_AfterExpand(object sender, TreeViewEventArgs e)
+       
+
+        private void button6_Click_1(object sender, EventArgs e)//下载文件按钮
         {
-            
+            if (label6.Text == textBox1.Text + "\\")
+            {
+                MessageBox.Show("不可从根目录下载");
+            }
+            else
+            {
+                if (label6.Text.Contains("."))//单文件下载
+                {
+                    progressBar1.Value = 0;
+                    progressBar1.Maximum = 1;
+                    string url = Uri.EscapeUriString(label6.Text.Replace(textBox1.Text, "http://117.80.86.174:88").Replace("\\", "/"));
+                    string local = label6.Text.Replace(textBox1.Text, "D:\\ctyunclass");
+                    Download(url, local);
+                    progressBar1.Value = 1;
+                    MessageBox.Show("已下载至\n\r" + local);
+                }
+                else//多文件下载
+                {
+                    int t = 0;
+                    newMsg = false;
+                    ClientSendMsg("pall_D:\\FILES\\" + label6.Text.Replace(textBox1.Text + "\\", ""));
+                    string[] at = null;
+                    while (!newMsg && t < 100)
+                    {
+                        Thread.Sleep(50);
+                        t++;
+                    }
+                    if (t < 100)
+                    {
+                        at = message.Split('$');
+                        progressBar1.Maximum = at.Count();
+                        foreach (string s in at)
+                        {
+                            progressBar1.Value++;
+                            if (s != "" && !s.Contains("temp"))
+                            {
+                                string url = Uri.EscapeUriString(s.Replace("D:\\FILES", "http://117.80.86.174:88").Replace("\\", "/"));
+                                string local = s.Replace("D:\\FILES", "D:\\ctyunclass");
+                                string[] ss = local.Split('\\');
+                                string subpath = "";
+                                foreach (string m in ss)
+                                {
+                                    if (m != "" && !m.Contains("."))
+                                    {
+                                        subpath += m + "\\";
+                                    }
+                                }
+                                if (false == System.IO.Directory.Exists(subpath))
+                                {
+                                    System.IO.Directory.CreateDirectory(subpath);
+                                }
+                                Download(url, local);
+                            }
+                        }
+                        MessageBox.Show("文件下载完成\n\r请在\""+ "D:\\ctyunclass\\" + label6.Text.Replace(textBox1.Text + "\\", "")+"\"查看");
+                        progressBar1.Value = 0;
+                    }
+                }
+            }
         }
     }
 }
