@@ -422,7 +422,7 @@ namespace WindowsFormsApp1
                         tempIP = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList[1].ToString();
                     ClientSendMsg("sql- UPDATE `student` SET `ip` =  '!tempIP!'where(name='" + textBox1.Text + "') ");//注册学生端当前IP
                    
-                    //Thread.Sleep(500);
+                    Thread.Sleep(250);
                     int t = 0;
                     newMsg = false;
                     ClientSendMsg("sql- select id from classroom where(name='" + comboBox2.SelectedItem.ToString() + "') ");//获得当前教室id
@@ -436,10 +436,10 @@ namespace WindowsFormsApp1
                         room_id = message.Split('$')[0];
                         Console.WriteLine("room_id:" + room_id + "\n\r");
                     }
-                    //Thread.Sleep(500);
+                    Thread.Sleep(250);
                     t = 0;
                     newMsg = false;
-                    ClientSendMsg("sql- select id from classroom where(class_now='" + textBox2.Text + "') ");//获得当前课程id
+                    ClientSendMsg("sql- select id from class where(name='" + textBox2.Text + "') ");//获得当前课程id
                     while (!newMsg && t < 100)
                     {
                         Thread.Sleep(50);
@@ -469,6 +469,7 @@ namespace WindowsFormsApp1
                     
 
                     ClientSendMsg("sql- INSERT INTO `attend` (`id_student`, `id_room`,`date`) VALUES ("+student_id+", "+room_id+",'"+DateTime.Now.ToShortDateString()+" "+DateTime.Now.ToShortTimeString()+":"+DateTime.Now.Second.ToString()+"');");//登记上课记录
+                    Thread.Sleep(250);
                     ClientSendMsg("login_" + room_id);//签到
                     class_name = textBox2.Text;
                     room_name = comboBox2.SelectedItem.ToString();

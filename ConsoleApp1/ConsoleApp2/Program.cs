@@ -240,16 +240,16 @@ namespace ConsoleApp2
 
                                 i++;
                             }
-                            if (i == 0 && temp.StartsWith("select"))
+                            if (resql=="" && temp.Contains("select"))
                             {
                                 resql = "$";
                             }
-                            Console.WriteLine(resql);
+                            Console.WriteLine("resql"+resql+"/resql");
                             sdr.Close();
                             mycmd.Cancel();
                             mycmd.Dispose();
                             socketServer.Send(Encoding.UTF8.GetBytes(resql));
-                            //Thread.Sleep(100);
+                            Thread.Sleep(100);
                         }
                         if(temp.StartsWith("photo_"))//转发拍照指令
                         {
@@ -406,6 +406,7 @@ namespace ConsoleApp2
 
                         }
                     }
+                    
                 }
                 catch (Exception e)
                 {
@@ -430,6 +431,7 @@ namespace ConsoleApp2
                     socketServer.Dispose();
                     break;
                 }
+                Thread.Sleep(100);
             }
 
         }
