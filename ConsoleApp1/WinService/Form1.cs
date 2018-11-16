@@ -334,6 +334,7 @@ namespace WinService
                 catch (Exception ex)
                 {
                     Console.WriteLine("远程服务器已经中断连接！" + ex.Message + "\r\n");
+
                     break;
                 }
             }
