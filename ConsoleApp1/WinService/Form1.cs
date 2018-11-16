@@ -674,7 +674,8 @@ namespace WinService
                 string[] a = message.Split('$');
                 comboBox2.Items.AddRange(a);
             }
-
+            comboBox2.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            comboBox2.AutoCompleteSource = AutoCompleteSource.ListItems;
             comboBox3.Items.Clear();
             newMsg = false;
             Console.WriteLine(newMsg.ToString());
@@ -690,6 +691,8 @@ namespace WinService
                 string[] a = message.Split('$');
                 comboBox3.Items.AddRange(a);
             }
+            comboBox3.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            comboBox3.AutoCompleteSource = AutoCompleteSource.ListItems;
         }
         
         private void button3_Click(object sender, EventArgs e)//上课按钮，将客户端注册到服务器

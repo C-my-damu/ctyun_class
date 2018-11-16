@@ -341,6 +341,17 @@ namespace WindowsFormsApp1
         {
             if (comboBox1.SelectedItem.ToString() != "")
             {
+                if (!SocketClient.Connected)
+                {
+                    if (-1 != startTCP()) MessageBox.Show("服务器重连成功");
+                    else
+                    {
+                        MessageBox.Show("服务器重连失败");
+                        Application.Exit();
+
+                    }
+
+                }
                 timer4.Enabled = true;
                 textBox1.Text = "";
                 newMsg = false;
@@ -377,6 +388,17 @@ namespace WindowsFormsApp1
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)//根据选择的教室加载课程
         {
+            if (!SocketClient.Connected)
+            {
+                if (-1 != startTCP()) MessageBox.Show("服务器重连成功");
+                else
+                {
+                    MessageBox.Show("服务器重连失败");
+                    Application.Exit();
+
+                }
+
+            }
             timer4.Enabled = true;
             textBox2.Text = "";
             newMsg = false;
@@ -403,13 +425,13 @@ namespace WindowsFormsApp1
                 Thread.Sleep(1000);
                 if (-1 == startTCP())//若连接异常推出程序
                 {
-                    MessageBox.Show("连接服务器失败！");
+                    MessageBox.Show("服务器重连失败！");
                     Thread.Sleep(1000);
                     Application.Exit();
                 }
                 else
                 {
-                    MessageBox.Show("连接服务器成功！");
+                    MessageBox.Show("服务器重连成功！");
                 }
             }
             if (comboBox1.SelectedIndex.ToString() != "" && comboBox2.SelectedItem.ToString() != "" && textBox2.Text != "无课程")
@@ -531,7 +553,7 @@ namespace WindowsFormsApp1
         {
             button2.Enabled = flag_scr;
             button3.Enabled = flag_cam;
-            if (textBox1.Text != "" && textBox2.Text !=""&&!button4.Enabled)
+            if (textBox1.Text != "" && textBox2.Text !="" && textBox2.Text != "无课程" && !button4.Enabled)
             {
                 button1.Enabled = true;
             }
@@ -705,6 +727,7 @@ namespace WindowsFormsApp1
                                 treeView1.SelectedNode.Nodes.Add(leefNode);
                             }
                         }
+                        treeView1.SelectedNode.Expand();
                     }
                 }
                 else//非根节点
@@ -766,6 +789,7 @@ namespace WindowsFormsApp1
                                     }
                                 }
                             }
+                            treeView1.SelectedNode.Expand();
                         }
 
                     }
@@ -773,7 +797,7 @@ namespace WindowsFormsApp1
                 }
 
             }
-            treeView1.SelectedNode.Expand();
+            
         }
 
        
@@ -792,6 +816,19 @@ namespace WindowsFormsApp1
                     progressBar1.Maximum = 1;
                     string url = Uri.EscapeUriString(label6.Text.Replace(textBox1.Text, "http://117.80.86.174:88").Replace("\\", "/"));
                     string local = label6.Text.Replace(textBox1.Text, "D:\\ctyunclass");
+                    string[] ss = local.Split('\\');
+                    string subpath = "";
+                    foreach (string m in ss)
+                    {
+                        if (m != "" && !m.Contains("."))
+                        {
+                            subpath += m + "\\";
+                        }
+                    }
+                    if (false == System.IO.Directory.Exists(subpath))
+                    {
+                        System.IO.Directory.CreateDirectory(subpath);
+                    }
                     Download(url, local);
                     progressBar1.Value = 1;
                     MessageBox.Show("已下载至\n\r" + local);
