@@ -109,8 +109,9 @@ namespace WindowsFormsApp2
                             
                             string week = "第" + getWeek().ToString() + "周";
                             string destpath = dirPath.Replace("temp", week+"\\"+fileName.Replace(".jpg",""));
-                            string copyname = fileName.Replace("pic", DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.ToShortTimeString().Replace(":", "-") + "-" + DateTime.Now.Second.ToString());
-                            copyname = fileName.Replace("src", DateTime.Now.Month.ToString()+"-"+DateTime.Now.Day.ToString() + "-" + DateTime.Now.ToShortTimeString().Replace(":", "-") + "-" + DateTime.Now.Second.ToString());
+                            string copyname = "";
+                            copyname = fileName.Replace("pic", DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.ToShortTimeString().Replace(":", "-") + "-" + DateTime.Now.Second.ToString());
+                            copyname = copyname.Replace("src", DateTime.Now.Month.ToString()+"-"+DateTime.Now.Day.ToString() + "-" + DateTime.Now.ToShortTimeString().Replace(":", "-") + "-" + DateTime.Now.Second.ToString());
                             if (!Directory.Exists(destpath))
                             {
                                 Directory.CreateDirectory(destpath);
@@ -141,20 +142,25 @@ namespace WindowsFormsApp2
         }
         private int getWeek()
         {
+            DateTime t1 = new DateTime(DateTime.Now.Year, 9, 1);
+            DateTime t2 = new DateTime(DateTime.Now.Year, 3, 1);
+            DateTime t3 = new DateTime(DateTime.Now.Year-1, 12, 31);
+            DateTime t4 = new DateTime(DateTime.Now.Year-1, 9, 1);
+
             int week = 0;
             if (DateTime.Now.Month < 3)
             {
-                week = (DateTime.Now.DayOfYear + 122) / 7;
+                week = (DateTime.Now.DayOfYear + t3.DayOfYear-t4.DayOfYear) / 7;
             }
             else
             {
                 if (DateTime.Now.Month<9)
                 {
-                    week = (DateTime.Now.DayOfYear - 59) / 7;               
+                    week = (DateTime.Now.DayOfYear - t2.DayOfYear) / 7;               
                 }
                 else
                 {
-                    week = (DateTime.Now.DayOfYear - 243) / 7;    
+                    week = (DateTime.Now.DayOfYear - t1.DayOfYear) / 7;    
                 }
             }
             return week;
@@ -184,6 +190,7 @@ namespace WindowsFormsApp2
             tcpListener = new TcpListener(IPAddress.Any, 6000);
             tcpListener.Start();
             txtReceive.Text = "开始侦听...";
+            txtReceive.Text += "\n\r现在是第" + getWeek().ToString()+"周";
             Thread thread = new Thread(ReceiveFileFunc);
             thread.Start();
             thread.IsBackground = true;
