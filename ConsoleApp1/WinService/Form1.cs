@@ -735,7 +735,13 @@ namespace WinService
 
         private void timer3_Tick(object sender, EventArgs e)
         {
+            if(SocketClient1!=null&& SocketClient1.Connected)
             ClientSendMsg("ping");
+            else
+            {
+                MessageBox.Show("服务器断开了连接");
+                timer3.Enabled = false;
+            }
         }
     }
 }

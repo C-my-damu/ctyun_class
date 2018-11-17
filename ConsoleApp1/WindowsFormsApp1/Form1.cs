@@ -659,7 +659,12 @@ namespace WindowsFormsApp1
 
         private void timer4_Tick(object sender, EventArgs e)//发送心跳包保持连接
         {
-            ClientSendMsg("ping");
+            if (SocketClient != null && SocketClient.Connected)
+                ClientSendMsg("ping");
+            else
+            { MessageBox.Show("服务器断开了连接");
+                timer4.Enabled = false;
+            }
         }         
 
         private void button5_Click(object sender, EventArgs e)//开启文件浏览，获取当前用户可访问的课程
