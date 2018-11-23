@@ -117,9 +117,9 @@ namespace ConsoleApp2
                 int clientPort = (connection.RemoteEndPoint as IPEndPoint).Port;
 
                 //让客户显示"连接成功的"的信息  
-                string sendmsg = "[" + "本地IP：" + clientIP + " 本地端口：" + clientPort.ToString() + " 连接服务端成功！]";
-                byte[] arrSendMsg = Encoding.UTF8.GetBytes(sendmsg);
-                connection.Send(arrSendMsg);
+                //string sendmsg = "[" + "本地IP：" + clientIP + " 本地端口：" + clientPort.ToString() + " 连接服务端成功！]";
+                //byte[] arrSendMsg = Encoding.UTF8.GetBytes(sendmsg);
+                //connection.Send(arrSendMsg);
 
                 //创建一个通信线程      
                 Thread thread = new Thread(recv);
@@ -248,7 +248,7 @@ namespace ConsoleApp2
                             sdr.Close();
                             mycmd.Cancel();
                             mycmd.Dispose();
-                            socketServer.Send(Encoding.UTF8.GetBytes(resql));
+                            socketServer.Send(Encoding.UTF8.GetBytes(resql+"\n\r"));
                             Thread.Sleep(100);
                         }
                         if(temp.StartsWith("photo_"))//转发拍照指令
@@ -367,7 +367,7 @@ namespace ConsoleApp2
                                 foreach (var socketTemp in ClientConnectionItems)
                                 {
 
-                                    socketTemp.Value.Send(Encoding.UTF8.GetBytes(temp.Replace("flag_", "")));
+                                    socketTemp.Value.Send(Encoding.UTF8.GetBytes(temp.Replace("flag_", "")+"\n\r"));
                                 }
                             }                                                 
                         }

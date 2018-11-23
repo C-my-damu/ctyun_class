@@ -100,7 +100,7 @@ namespace WindowsFormsApp1
                     int length = SocketClient.Receive(arrRecvmsg);
                     
                     //将套接字获取到的字符数组转换为人可以看懂的字符串  
-                    string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
+                    string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length).Replace("\n\r","");
                     Console.WriteLine(strRevMsg);
                     if (strRevMsg.StartsWith("f-t") || strRevMsg.StartsWith("t-f") ||//接收到权限变化指令
                         strRevMsg.StartsWith("f-f") || strRevMsg.StartsWith("t-t")|| strRevMsg.StartsWith("fs") || strRevMsg.StartsWith("fc"))

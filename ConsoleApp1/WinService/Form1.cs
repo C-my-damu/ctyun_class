@@ -216,7 +216,8 @@ namespace WinService
                     int length = SocketClient1.Receive(arrRecvmsg);
 
                     //将套接字获取到的字符数组转换为人可以看懂的字符串  
-                    string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length);
+                    string strRevMsg = Encoding.UTF8.GetString(arrRecvmsg, 0, length).Replace("\n\r", "");
+                  
                     if(strRevMsg=="photo"|| strRevMsg == "screen" || strRevMsg == "login"|| strRevMsg == "logout")//处理命令
                     {
                         switch (strRevMsg)
