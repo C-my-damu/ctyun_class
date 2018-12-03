@@ -84,9 +84,10 @@ namespace WinService
                 {                     
                     SocketClient1.Connect(ipe1);                    
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    MessageBox.Show("连接失败！\r\n程序即将关闭");                
+                    MessageBox.Show("连接失败！\r\n程序即将关闭");
+                    Console.WriteLine(e.ToString());
                     return -1;
                 }
                 //try
